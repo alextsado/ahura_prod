@@ -1,0 +1,22 @@
+ {
+    "name": "Ahura AI Data Collection",
+    "version": "0.1",
+    "description": "Collect data in order to train an AI that can predict when you're about to get distracted based on your facial expressions!",
+    "manifest_version": 2,
+    "browser_action": { 
+        "default_title": "Ahura AI Data Collection.", 
+        "default_icon":  "ahura-blue.png",
+        "default_popup": "popup.html"
+     },
+    "permissions": [
+            "storage"
+    ],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "content_scripts": [{
+        "matches": ["*://*/*"], 
+        "js": ["content.js"]
+    }]
+  }

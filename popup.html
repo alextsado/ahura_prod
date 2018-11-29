@@ -1,0 +1,60 @@
+<!-- First PopUp page, for now just a form that collects the users' 
+    description and some additional keywords
+
+    @Author Barnaby B
+    @Since Nov 15, 2018
+-->
+<html>
+    <head>
+        <script type="text/javascript" src="popup.js"></script>
+    <body>
+        <h2>Ahura AI</h2>
+        <div id="error_content" style="width: 400; visibility: hidden; color: red; font-weoght: bold">
+            &nbsp;
+        </div>
+        <div id="collection_content" style="width: 400px;" id="creation_form">
+            <div>
+                <label for="description">
+                    Description
+                    <font color="red">*</font>
+                </label>
+            </div>
+
+            <div>
+                <input name="description"
+                       style="width: 350px;"
+                        placeholder="Adequate description of the topic to be studied">
+                </input>
+            </div>
+            <div>
+                <label for="keywords1">
+                    Additional Keywords (separate by periods)
+                </label>
+            </div>
+            <div>
+                <input name="additional_keywords"
+                       style="width: 350px;"
+                       placeholder="Keywords to supliment the description">
+                </input>
+            </div>
+            <div>
+                <label for="duration"><label>
+            </div>
+            <div>
+                <select id="duration" name="duration">
+                    <option value="5">5 Minutes</option>
+                    <option value="10">10 Minutes</option>
+                    <option value="15">15 Minutes</option>
+                    <option selected value="20">20 Minutes</option>
+                </select>
+            </div>
+
+            <button id="submit_button" type="submit" value="submit">
+                Submit
+            </button>
+        </div>
+        <div style="width: 400; visibility: hidden;" id="ongoing_study">
+            Study Session ongoing. <button id="stop_session">Complete Session</button>
+        </div>
+    </body>
+</html>
