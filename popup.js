@@ -4,6 +4,18 @@
  * @Author Barnaby B.
  * @Since Nov 14, 2018
  */
+
+/*
+ * Prevent the user from inadvertantly closing the window
+ */
+let is_ongoing_session = false;
+window.onbeforeunload = function(){
+    //TODO put a message into the chat area since it probably won't show up in the popup;
+    if(is_ongoing_session){
+        return "Closing this window will end your study session";
+    }
+};
+
 window.onload = function(){
     //If there's an ongoing study session then show the ongoing dialog
     chrome.storage.sync.get("end_time", result => {
@@ -35,6 +47,7 @@ window.onload = function(){
                 console.log("success! " + new Date().getTime());
                 console.log(response);
                 if(!!response && !!response.success){
+                    is_ongoing_session = true;
                     document.querySelector("#ongoing_study")
                         .style.visibility = "visible";
                     document.querySelector("#collection_content")
@@ -70,6 +83,7 @@ window.onload = function(){
              "stop_time": stop_time.getTime(),
          }, response => {
             if(!!response && !!response.success){
+                is_ongoing_session = false;
                 document.querySelector("#ongoing_study").style.visibility = "hidden";
                 document.querySelector("#collection_content").style.visibility = "visible";
             }else{

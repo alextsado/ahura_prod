@@ -16,6 +16,7 @@ let session_end_timer = null;
  * Get the browser ID
  */
 let user_id = null;
+let chat_window = null;
 //chrome.storage.sync.remove('user_id', function(result){ console.log("removed user_id"); }); //only uncomment this line debugging if you have reset the DB.
 chrome.storage.sync.get('user_id', function(result){
     if(!!result && !!result.user_id) {
@@ -26,7 +27,7 @@ chrome.storage.sync.get('user_id', function(result){
         xhr.open("POST", "http://13.59.94.191/users/")
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.responseType = "json";
-        xhr.onreadystatechange = function() {
+        xhr.onreadystatechange = function(){
             if(xhr.readyState === 4) {
                 new_user_id = xhr.response.user_id; // ??JSON.parse
                 chrome.storage.sync.set({"user_id": new_user_id}, function() {
@@ -37,6 +38,41 @@ chrome.storage.sync.get('user_id', function(result){
         xhr.send(JSON.stringify({"password": "VH2Cjg'mme=>U[UG"}));
     }
 });
+
+
+/**
+ * When a user clicks the icon then open a new window
+ */
+
+chrome.browserAction.onClicked.addListener(function(tab) {
+    if(!!chat_window){
+        try{
+            chrome.windows.update(chat_window.id, { "focused": true });  
+        }catch(e){
+            console.log(e);
+            chat_window = null;
+        }
+    }
+    if(!chat_window){
+        chrome.windows.create({
+            url: chrome.runtime.getURL("popup.html"),
+            type: "popup",
+            "focused": true,
+            "width": 550,
+            "height": 850
+        }, win => {
+            chat_window = win;
+        });
+    }
+});
+
+chrome.windows.onRemoved.addListener(window_id => {
+    if(!!chat_window && window_id === chat_window.id){
+        console.log("THEY CLOSED THE WINDOW!!!");
+        chat_window = null;
+    }
+});
+
 
 /**
  * Whenever a new page is loaded the content.js script sends over its'
@@ -130,6 +166,7 @@ function summary_text(msg, sender, sendResponse){
                 "page_id": xhr.response.page_id
             });
         }
+        //TODO update the popup page so that it can show the user that their page was found relevant or not.
     }
 
     chrome.storage.sync.get(["session_id", "end_time", "user_id"], results => {
@@ -147,6 +184,10 @@ function summary_text(msg, sender, sendResponse){
 } 
 
 
+/**
+ * Handle a user clicking to stop the session. Send it to 
+ * the server and remove all of the local storage about the ongoing session.
+ */
 function stop_session(msg, sender, sendResponse){
     session_end_timer = null;
     let session_id = null;
