@@ -30,14 +30,20 @@ function summary_text(msg, sender, sendResponse){
 
     xhr.onreadystatechange = function(){
         if(xhr.readyState === 4 && xhr.status <= 299){
-            //TODO maybe instead of saving this... send it to the content page itself so that the user can adjust it there?
             chrome.storage.sync.set({
                 "is_relevant" : xhr.response.is_relevant,
                 "keywords": xhr.response.keywords,
                 "page_id": xhr.response.page_id
             });
+            let page_visited = document.createElement("div")
+            page_visited.append(sender.url)
+            if(xhr.response.is_relevant){
+                page_visited.style.color = "green";
+            }else{
+                page_visited.style.color = "red";
+            }
+            document.querySelector("#add_pages_visited").append(page_visited);
         }
-        //TODO update the popup page so that it can show the user that their page was found relevant or not.
     }
 
     chrome.storage.sync.get(["session_id", "end_time", "user_id"], results => {
