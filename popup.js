@@ -6,9 +6,97 @@
  */
 
 /*
+ * Route any messages relevant to the functionality of the window
+ */
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    //Message from a newly loaded page
+    if(msg.type === "summary-text"){
+        summary_text(msg, sender, sendResponse);   
+    }
+});
+
+/*
+ * Handle a summary text  message from the content page
+ */
+function summary_text(msg, sender, sendResponse){
+    //TODO may have to get the session ID from sync
+    let pkg = {
+        "url": sender.url,
+        "content": msg.message,
+        "load_time": msg.load_time
+    }
+    let xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = function(){
+        if(xhr.readyState === 4 && xhr.status <= 299){
+            //TODO maybe instead of saving this... send it to the content page itself so that the user can adjust it there?
+            chrome.storage.sync.set({
+                "is_relevant" : xhr.response.is_relevant,
+                "keywords": xhr.response.keywords,
+                "page_id": xhr.response.page_id
+            });
+        }
+        //TODO update the popup page so that it can show the user that their page was found relevant or not.
+    }
+
+    chrome.storage.sync.get(["session_id", "end_time", "user_id"], results => {
+        if(!results || !results.session_id){
+            throw new Exception("There is no session ID but we called STOP on it");
+        }
+        pkg["session_id"] = results.session_id;
+        xhr.open("POST", "http://13.59.94.191/pages/")
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.responseType = "json";
+
+        xhr.send(JSON.stringify(pkg));
+    });
+    return true;
+}
+
+/*
  * Prevent the user from inadvertantly closing the window
  */
 let is_ongoing_session = false;
+let media_recorder; //will store the video in 6 second chunks for upload
+
+
+
+/**
+* Upload the webcamera stream every 6 seconds.
+* TODO call this when a user starts a new session.
+*/
+function setup_media_recording(){
+    navigator.mediaDevices.getUserMedia({audio: true, video: true}).then(stream=>{
+      media_recorder = new MediaRecorder(stream);
+      media_recorder.ondataavailable = e => {
+          upload_blob(e.data);
+      }
+    });
+}
+
+
+/**
+ * If the media_recorder is set up then start recording in 6 second intervals
+ */
+function start_recording(){
+    if(!!media_recorder){
+        media_recorder.start(6000);
+    }else{
+        alert("Failed to start media recorder. Please reload the page and try again.")
+    }
+}
+
+
+/**
+ * POST the video clip
+ */
+function upload_blob(video_data){
+    alert("upload_blob is not implemented");
+}
+
+
+
 window.onbeforeunload = function(){
     //TODO put a message into the chat area since it probably won't show up in the popup;
     if(is_ongoing_session){
@@ -74,6 +162,8 @@ window.onload = function(){
     /**
      * Clicking the "complete session" button makes the session end.
      * No more sending things and the user is able to start a new session.
+     *
+     * TODO add   media_recorder.stop();
      */
      document.querySelector("#stop_session").addEventListener("click", event => {
          let stop_time = new Date();

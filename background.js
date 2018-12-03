@@ -7,6 +7,24 @@
  */
 
 /*
+ * Route messages from other parts of the app accordingly.
+ * TODO move "topic-submit" out of messages, and just let the window handle it
+ */
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    //message from newly submitted form
+    if(msg.type === "topic-submit"){
+        topic_submit(msg, sender, sendResponse);
+    }
+   
+    //Stop the session
+    else if(msg.type === "stop_session"){
+        stop_session(msg, sender, sendResponse);
+    }
+    return true;
+});
+
+
+/*
  * Generate a random user ID in case one doesn't already exist
  */
 let session_end_timer = null;
@@ -73,30 +91,6 @@ chrome.windows.onRemoved.addListener(window_id => {
     }
 });
 
-
-/**
- * Whenever a new page is loaded the content.js script sends over its'
- * content after the first header. Send this to the API to get its 
- * relevance
- */
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    //message from newly submitted form
-    if(msg.type === "topic-submit"){
-        topic_submit(msg, sender, sendResponse);
-    }
-
-    //Message from a newly loaded page
-    else if(msg.type === "summary-text"){
-        summary_text(msg, sender, sendResponse);   
-    }
-    
-    //Stop the session
-    else if(msg.type === "stop_session"){
-        stop_session(msg, sender, sendResponse);
-    }
-    return true;
-});
-
 /*
  * Handle a topic submission from the popup page.
  */
@@ -132,6 +126,7 @@ function topic_submit(msg, sender, sendResponse){
             });
 
             session_end_timer = setTimeout(function(){
+                //TODO message the window so that it can change the display of the session.
                 chrome.storage.sync.set({"session_id": null, "description": null, 
                     "keywords": null, "end_time": null}, function(){
                         console.log("saved session to disk");
