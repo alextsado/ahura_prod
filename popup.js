@@ -17,10 +17,71 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 });
 
 /*
+ * TODO get the page ID from the link data, not the session id from the stored information
+ *
+ * Clickingo n a keyword sends an ajax request to make the page legit.
+ */
+function keyword_click(event){
+    let keyword_link = event.target;
+    let new_keyword = keyword_link.innerText;
+    let page_id = keyword_link.closest(".page_history").getAttribute("page_id");
+    console.log("keyword clicked: " + new_keyword);
+    console.log("page_id: " + page_id);
+    let pkg = {"new_keyword": new_keyword}
+
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://13.59.94.191/pages/" + page_id + "/");
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.responseType = "json";
+
+    xhr.onreadystatechange = function(){
+        if(xhr.readyState === 4 && xhr.status <= 299){
+            console.log("SUCCESS");
+            //TODO remove all the keywords, the link, the instructions and change the url to green 
+            let del_me = keyword_link.closes("make_relevant_content");
+            del_me.parentNode.style.color = green;
+            del_me.parentNode.removeChild(del_me);
+        }
+    }
+    xhr.send(JSON.stringify(pkg));
+
+
+    return false;
+}
+
+/*
+ * Clicking on a 'make relevant' link shows the list of keywords
+ * each of which when clicked triggers an event to add them to the session.
+ */
+function show_relevant_keywords(event){
+    let button_pressed = event.target;
+    let keywords = button_pressed.getAttribute("noun_keywords");
+    let instruction_div = document.createElement("div");
+    instruction_div.append("Select which of these keywords make it relevant:");
+    button_pressed.parentNode.append(instruction_div);
+
+
+    let keywords_list = keywords.split("~");
+    let keywords_unordered_list = document.createElement("ul");
+    for(x in keywords_list){
+        let keyword_list_item = document.createElement("li");
+        let keyword_link = document.createElement("a");
+        keyword_link.append(keywords_list[x]);
+        keyword_link.setAttribute("href", "#");
+        keyword_link.addEventListener("click", keyword_click);
+        keyword_list_item.append(keyword_link);
+        keywords_unordered_list.append(keyword_list_item);
+    }
+    button_pressed.parentNode.append(keywords_unordered_list);
+
+    //TODO make a cancel button that deletes this list
+    return false;
+}
+
+/*
  * Handle a summary text  message from the content page
  */
 function summary_text(msg, sender, sendResponse){
-    //TODO may have to get the session ID from sync
     let pkg = {
         "url": sender.url,
         "content": msg.message,
@@ -37,10 +98,25 @@ function summary_text(msg, sender, sendResponse){
             });
             let page_visited = document.createElement("div")
             page_visited.append(sender.url)
+            page_visited.classList.add("page_history");
+            page_visited.setAttribute("page_id", xhr.response.page_id);
             if(xhr.response.is_relevant){
                 page_visited.style.color = "green";
             }else{
                 page_visited.style.color = "red";
+                //TODO add a list of keywords that would make this relevant
+                let parent_div = document.createElement("div");
+                parent_div.classList.add("make_relevant_content");
+                let make_relevant_button = document.createElement("a");
+                make_relevant_button.setAttribute("href", "#");
+                make_relevant_button.append("Make relevant");
+                make_relevant_button.setAttribute("noun_keywords", xhr.response.keywords);
+                make_relevant_button.addEventListener("click", show_relevant_keywords);
+                parent_div.append(make_relevant_button);
+                page_visited.append(parent_div);
+
+
+                //TODO make a TRANSITIONAL PAGE button as well.
             }
             document.querySelector("#add_pages_visited").append(page_visited);
         }
@@ -61,46 +137,26 @@ function summary_text(msg, sender, sendResponse){
 }
 
 /*
+ * Put a spinner on top of the submission form
+ */
+function create_topic_submission_spinner(){
+    console.log("creating the topic submission_spinner");
+    let topic_submission_form = document.getElementById("collection_content");
+    let my_rect = topic_submission_form.getBoundingClientRect();
+    let spinner = document.createElement("img");
+    spinner.setAttribute("src", "spinner.gif");
+    spinner.setAttribute("id", "topic_submission_spinner");
+    spinner.style.position = "absolute";
+    spinner.style.top = my_rect.x;
+    spinner.style.left = my_rect.y;
+    spinner.style.width = "150px";
+    document.querySelector("body").append(spinner);
+}
+
+/*
  * Prevent the user from inadvertantly closing the window
  */
 let is_ongoing_session = false;
-let media_recorder; //will store the video in 6 second chunks for upload
-
-
-
-/**
-* Upload the webcamera stream every 6 seconds.
-* TODO call this when a user starts a new session.
-*/
-function setup_media_recording(){
-    navigator.mediaDevices.getUserMedia({audio: true, video: true}).then(stream=>{
-      media_recorder = new MediaRecorder(stream);
-      media_recorder.ondataavailable = e => {
-          upload_blob(e.data);
-      }
-    });
-}
-
-
-/**
- * If the media_recorder is set up then start recording in 6 second intervals
- */
-function start_recording(){
-    if(!!media_recorder){
-        media_recorder.start(6000);
-    }else{
-        alert("Failed to start media recorder. Please reload the page and try again.")
-    }
-}
-
-
-/**
- * POST the video clip
- */
-function upload_blob(video_data){
-    alert("upload_blob is not implemented");
-}
-
 
 
 window.onbeforeunload = function(){
@@ -130,7 +186,7 @@ window.onload = function(){
             "[name=additional_keywords]").value;
         let duration = document.querySelector("[name=duration]").value;
         if(!!description){
-
+            create_topic_submission_spinner();
             chrome.runtime.sendMessage({
                 "type": "topic-submit",
                 "description": description + " . " + additional_keywords,
@@ -146,6 +202,10 @@ window.onload = function(){
                         .style.visibility = "visible";
                     document.querySelector("#collection_content")
                         .style.visibility = "hidden";
+                    let topic_submission_spinner = document.querySelector("#topic_submission_spinner");
+                    if(!!topic_submission_spinner){
+                        topic_submission_spinner.parentNode.removeChild(topic_submission_spinner);
+                    }
                 }else{
                     if(!!response && !!response.error){
                         document.querySelector("#error_content").innerText = response.error;
