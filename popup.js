@@ -13,9 +13,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     //Message from a newly loaded page
     if(msg.type === "summary_text"){
         summary_text(msg, sender, sendResponse);   
-    }else(if msg.type === "end_session"){
+    }else if( msg.type === "end_session"){
         is_ongoing_session = false;
-        //TODO also change the display to look as if the user had already clicked finish
+        document.querySelector("#ongoing_study").style.display = "none";
+        document.querySelector("#collection_content").style.display = "contents";
     }
 });
 
