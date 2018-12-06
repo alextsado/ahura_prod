@@ -158,26 +158,51 @@ function create_topic_submission_spinner(){
  */
 let is_ongoing_session = false;
 
+async function _is_ongoing_session(){
+    let result_promise = new Promise(resolve =>{ chrome.storage.sync.get("end_time", result => {
+            if(!!result && !!result.end_time && new Date() < new Date(result.end_time)){
+                console.log("inside function says it's ongoing", new Date().getTime());
+                resolve(true);
+            }else{
+                console.log("inside function says it's not ongoing", new Date().getTime());
+                resolve(false);
+            }
+        });
+    });
+    let result = await result_promise;
+      
+    console.log("Got a result: ", result, new Date().getTime());
+    return result;
+}
+ 
+
 
 window.onbeforeunload = function(){
     //TODO put a message into the chat area since it probably won't show up in the popup;
-    if(is_ongoing_session){
-        return "Closing this window will end your study session";
+    //if(is_ongoing_session){
+    //    return "Closing this window will end your study session";
+    //}
+    let asdf = await _is_ongoing_session();
+    console.log("about to check for ongoing session");
+    if(_is_ongoing_session()){
+        return "closing this window will end your study session";
     }
-};
+}
 
 window.onload = function(){
     //If there's an ongoing study session then show the ongoing dialog
     chrome.storage.sync.get("end_time", result => {
         if(new Date() < new Date(result.end_time)){
-            document.querySelector("#ongoing_study").style.visibility = "visible";
-            document.querySelector("#collection_content").style.visibility = "hidden";
+            document.querySelector("#ongoing_study").style.display = "contents";
+            document.querySelector("#collection_content").style.display = "none";
         }
     });
 
     /*
      * When a user clicks the submit button then get the values, make sure they're not empty
      * and send a message to the background so that it can start the session and everything.
+     *
+     * TODO this should be the topic_submit_button
      */
     document.querySelector("#submit_button").addEventListener("click", event => {
         let time_started = new Date();
@@ -199,9 +224,9 @@ window.onload = function(){
                 if(!!response && !!response.success){
                     is_ongoing_session = true;
                     document.querySelector("#ongoing_study")
-                        .style.visibility = "visible";
+                        .style.display = "contents";
                     document.querySelector("#collection_content")
-                        .style.visibility = "hidden";
+                        .style.display = "none";
                     let topic_submission_spinner = document.querySelector("#topic_submission_spinner");
                     if(!!topic_submission_spinner){
                         topic_submission_spinner.parentNode.removeChild(topic_submission_spinner);
@@ -209,10 +234,10 @@ window.onload = function(){
                 }else{
                     if(!!response && !!response.error){
                         document.querySelector("#error_content").innerText = response.error;
-                        document.querySelector("#error_content").style.visibility = "visible";
+                        document.querySelector("#error_content").style.display = "contents";
                     }else{
                         document.querySelector("#error_content").innerText = "Unkown Error";
-                        document.querySelector("#error_content").style.visibility = "visible";
+                        document.querySelector("#error_content").style.display = "contents";
                     }
                 }
                 return true;
@@ -221,7 +246,7 @@ window.onload = function(){
             console.log("errors");
             document.querySelector("#error_content")
                 .innerText = "Please fill out both form fields";
-            document.querySelector("#error_content").style.visibility = "visible";
+            document.querySelector("#error_content").style.display = "contents";
         }
     });
 
@@ -240,13 +265,13 @@ window.onload = function(){
          }, response => {
             if(!!response && !!response.success){
                 is_ongoing_session = false;
-                document.querySelector("#ongoing_study").style.visibility = "hidden";
-                document.querySelector("#collection_content").style.visibility = "visible";
+                document.querySelector("#ongoing_study").style.display = "none";
+                document.querySelector("#collection_content").style.display = "contents";
             }else{
                 console.log("errors");
                 document.querySelector("#error_content")
                     .innerText = "There was an error in closing this session";
-                document.querySelector("#error_content").style.visibility = "visible";
+                document.querySelector("#error_content").style.display = "contents";
             }
              return true;
          });

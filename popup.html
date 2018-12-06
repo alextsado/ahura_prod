@@ -10,36 +10,40 @@
     </head>
     <body>
         <h2>Ahura AI</h2>
-        <div id="error_content" style="width: 400; visibility: hidden; color: red; font-weoght: bold">
+        <div id="error_content" style="width: 400; display: none; color: red; font-weoght: bold">
             &nbsp;
+        </div>
+        <div id="user_name_form" style="width: 400; display: none;">
+            <h3>Hi. My name is Ms. Crabtree, your new tutor. What's your name?</h3>
+            <input id="user_name_input" name="user_name" style="width: 350px;" placeholder="Jane Smith">
+            <button type="submit" value="Submit" id="user_name_submit">Submit</button>
         </div>
         <div id="collection_content" style="width: 400px;" id="creation_form">
             <div>
                 <label for="description">
-                    Description
-                    <font color="red">*</font>
+                    Could you give me a short description of what you'd like to study today so that I can help you stick to it?
                 </label>
             </div>
 
             <div>
                 <input name="description"
                        style="width: 350px;"
-                        placeholder="Adequate description of the topic to be studied">
+                        placeholder="For example: 'Origins of the electoral college.'">
                 </input>
             </div>
             <div>
                 <label for="keywords1">
-                    Additional Keywords (separate by periods)
+                    Would you like to add any additional keywords?
                 </label>
             </div>
             <div>
                 <input name="additional_keywords"
                        style="width: 350px;"
-                       placeholder="Keywords to supliment the description">
+                       placeholder="For example: 'Constitution'">
                 </input>
             </div>
             <div>
-                <label for="duration"><label>
+                <label for="duration">And how long would you like to study for?<label>
             </div>
             <div>
                 <select id="duration" name="duration">
@@ -54,8 +58,10 @@
                 Submit
             </button>
         </div>
-        <div style="width: 400; visibility: hidden;" id="ongoing_study">
-            Study Session ongoing. <button id="stop_session">Complete Session</button>
+        <div style="width: 400; display: none;" id="ongoing_study">
+             Alright, get to studying. I'll tell you when a page was off topic (feel free to correct me if it's on topic after all).
+             <br/>
+             <button id="stop_session">Ok Ms. Crabtree, I'm done.</button>
         </div>
 
 

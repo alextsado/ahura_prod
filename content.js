@@ -10,7 +10,7 @@ let load_time = new Date();
  * a pomodoro study session right now 
  */
 chrome.storage.sync.get(["end_time", "session_id"], results => {
-    if(!!results && !!results.session_id && results.end_time){
+    if(!!results && !!results.session_id && !!results.end_time){
         if(new Date() < new Date(results.end_time)){
             ahura_go(results);
         }

@@ -31,16 +31,20 @@ let session_end_timer = null;
 
 
 /*
- * Get the browser ID
+ * Get the browser ID and users name
  */
 let user_id = null;
 let chat_window = null;
 //chrome.storage.sync.remove('user_id', function(result){ console.log("removed user_id"); }); //only uncomment this line debugging if you have reset the DB.
-chrome.storage.sync.get('user_id', function(result){
-    if(!!result && !!result.user_id) {
+
+
+chrome.storage.sync.get(['user_id', 'user_name'], function(result){
+    if(!!result && !!result.user_id && result.user_id.length <= 1 && !!result.user_name && result.user_name.length <= 1) {
         user_id = result.user_id;
+        user_name = result.user_name;
     } else {
-        //TODO make an AJAX call here instead and get the UUID
+        //TODO get_user_name();
+        let user_name = "TEST USER";
         xhr = new XMLHttpRequest();
         xhr.open("POST", "http://13.59.94.191/users/")
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -48,7 +52,7 @@ chrome.storage.sync.get('user_id', function(result){
         xhr.onreadystatechange = function(){
             if(xhr.readyState === 4) {
                 new_user_id = xhr.response.user_id; // ??JSON.parse
-                chrome.storage.sync.set({"user_id": new_user_id}, function() {
+                chrome.storage.sync.set({"user_name": user_name, "user_id": new_user_id}, function() {
                     user_id = new_user_id;
                 });
             }
@@ -182,6 +186,8 @@ function summary_text(msg, sender, sendResponse){
 /**
  * Handle a user clicking to stop the session. Send it to 
  * the server and remove all of the local storage about the ongoing session.
+ *
+ * TODO this should also handle when a user closes the window.
  */
 function stop_session(msg, sender, sendResponse){
     session_end_timer = null;
@@ -215,48 +221,3 @@ function stop_session(msg, sender, sendResponse){
     });
     return true;
 }
-
-
-//CODE FOR EVENTUAL MEDIA RECORDING!!!
-
-
-     /**
-      * Upload the webcamera stream every 6 seconds.
-      *
-      function setup_media_recording(){
-        navigator.mediaDevices.getUserMedia({audio: true, video: true}).then(stream=>{
-          media_recorder = new MediaRecorder(stream);
-          media_recorder.ondataavailable = e => {
-              upload_blob(e.data);
-          }
-        });
-      }
-
-
-
-	let media_recorder; //will store the video in 6 second chunks for upload
-
-
-
-    function start_recording(){
-        if(!!media_recorder){
-            media_recorder.start(6000);
-            log_event({
-                "EventType": {S: EVENT_TYPES.start_recording}, 
-                "PlayerLength": {N: String(player.getDuration())},
-            });
-        }else{
-            alert("Failed to start media recorder. Please reload the page and try again.")
-        }
-    }
-
-
-
-
-stop_button.addEventListener("click", e=>{    
-	media_recorder.stop();
-});
-
-
-*/
-
