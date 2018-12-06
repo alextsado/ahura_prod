@@ -43,21 +43,7 @@ chrome.storage.sync.get(['user_id', 'user_name'], function(result){
         user_id = result.user_id;
         user_name = result.user_name;
     } else {
-        //TODO get_user_name();
-        let user_name = "TEST USER";
-        xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://13.59.94.191/users/")
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhr.responseType = "json";
-        xhr.onreadystatechange = function(){
-            if(xhr.readyState === 4) {
-                new_user_id = xhr.response.user_id; // ??JSON.parse
-                chrome.storage.sync.set({"user_name": user_name, "user_id": new_user_id}, function() {
-                    user_id = new_user_id;
-                });
-            }
-        }
-        xhr.send(JSON.stringify({"password": "VH2Cjg'mme=>U[UG"}));
+        open_window();
     }
 });
 
@@ -67,6 +53,13 @@ chrome.storage.sync.get(['user_id', 'user_name'], function(result){
  */
 
 chrome.browserAction.onClicked.addListener(function(tab) {
+    open_window();
+});
+
+/*
+ * Bring the window to the forefront, or open it up if it isn't already.
+ */
+function open_window(){
     if(!!chat_window){
         try{
             chrome.windows.update(chat_window.id, { "focused": true });  
@@ -86,7 +79,8 @@ chrome.browserAction.onClicked.addListener(function(tab) {
             chat_window = win;
         });
     }
-});
+}
+
 
 chrome.windows.onRemoved.addListener(window_id => {
     if(!!chat_window && window_id === chat_window.id){

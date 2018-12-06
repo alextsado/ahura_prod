@@ -45,7 +45,7 @@ function keyword_click(event){
             let del_me = keyword_link.closes("make_relevant_content");
             del_me.parentNode.style.color = green;
             del_me.parentNode.removeChild(del_me);
-        }
+        }//TODO should handle failure?
     }
     xhr.send(JSON.stringify(pkg));
 
@@ -163,18 +163,89 @@ function create_topic_submission_spinner(){
 let is_ongoing_session = false;
 
 
+/*
+ * Prevent the user from closing the window by accident 
+ * if they have a session going on
+ */
 window.onbeforeunload = function(){
     if(is_ongoing_session){
         return "Closing this window will end your study session";
     }
 }
 
+/*
+ * AJAX call to set the users' name and to get an id from the server
+ * @Param the users name
+ * @TODO validate that the users name is appropriate
+ * @Returns a promise with success returning the users ID and the catch() has the error status
+ */
+function set_user_name_get_user_id(user_name){
+    return new Promise((resolve, reject) => {
+        fetch("http://13.59.94.191/users/", {
+            method: 'post',
+            body: JSON.stringify({
+                "user_name": user_name,
+                "password": "VH2Cjg'mme=>U[UG"}),
+            headers: {
+                "Content-type": "application/json;charset=UTF-8"
+            }
+        }).then(response => {
+            if (!response.ok) {
+                reject(response.statusText);
+            }else{
+                chrome.storage.sync.set({
+                    "user_name": user_name,
+                    "user_id": response.json().user_id
+                });
+                resolve(response.json().user_id);
+            }
+        });
+    });
+}
+
+/*
+ * When the page loads first check whether there's an ongoing session (unlikely)
+ * and whether the user has already logged in before and provided a name. If they
+ * haven't then ask them for their name.
+ *
+ * Then set all of the event handlers
+ */
 window.onload = function(){
-    //If there's an ongoing study session then show the ongoing dialog
-    chrome.storage.sync.get("end_time", result => {
-        if(new Date() < new Date(result.end_time)){
+    chrome.storage.sync.get(["end_time", "user_name", "user_id"], result => {
+        //If there's an ongoing study session then show the ongoing dialog
+        if(!!result && result.end_time && new Date() < new Date(result.end_time)){
             document.querySelector("#ongoing_study").style.display = "contents";
             document.querySelector("#collection_content").style.display = "none";
+        }
+        //If it's the first time then there's no username and no user id
+        if(!!result && !!result.user_name && result.user_name.length >= 1){
+            console.log("There is a username", result.user_name);
+            document.querySelector("#user_name_greeting").innerText = result.user_name;
+        }else{ //There is no username 
+            document.querySelector("#collection_content").style.display = "none";
+            document.querySelector("#greeting").style.display = "none";
+            document.querySelector("#user_name_form").style.display = "contents";
+        }
+    });
+
+    document.querySelector("#user_name_submit").addEventListener("click", event => {
+        let user_name = document.querySelector("#user_name_input").value;
+        if(user_name.length <= 1){ //ask again
+            console.log("No username");
+            document.querySelector("#user_name_input").focus();
+            document.querySelector("#user_name_submit").append("Please fill in a name and resubmit.");
+        }else{ //username is good
+            console.log("username is ", user_name);
+            set_user_name_get_user_id(user_name).then( user_id => {
+                console.log(user_id);
+                document.getElementById("user_name_form").style.display = "none";
+                document.querySelector("#user_name_greeting").innerText = user_name;
+                document.getElementById("greeting").style.display = "contents";
+                document.getElementById("collection_content").style.display = "contents";
+            }).catch( err => {
+                console.log(err);
+                //TODO something on the UI to show that the AJAX call failed
+            });
         }
     });
 
