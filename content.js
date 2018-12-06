@@ -57,7 +57,7 @@ function ahura_go(results){
         first_500 = "";
     }
     chrome.runtime.sendMessage({
-        type: "summary-text",
+        type: "summary_text",
         session_id: results.session_id,
         message: first_500,
         load_time: load_time.getTime()

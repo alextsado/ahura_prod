@@ -8,11 +8,11 @@
 
 /*
  * Route messages from other parts of the app accordingly.
- * TODO move "topic-submit" out of messages, and just let the window handle it
+ * TODO move "topic_submit" out of messages, and just let the window handle it
  */
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     //message from newly submitted form
-    if(msg.type === "topic-submit"){
+    if(msg.type === "topic_submit"){
         topic_submit(msg, sender, sendResponse);
     }
    
@@ -131,6 +131,7 @@ function topic_submit(msg, sender, sendResponse){
 
             session_end_timer = setTimeout(function(){
                 //TODO message the window so that it can change the display of the session.
+                chrome.runtime.sendMessage({"type": "end_session"});
                 chrome.storage.sync.set({"session_id": null, "description": null, 
                     "keywords": null, "end_time": null}, function(){
                         console.log("saved session to disk");

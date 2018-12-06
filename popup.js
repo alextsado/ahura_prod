@@ -11,15 +11,18 @@
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     //Message from a newly loaded page
-    if(msg.type === "summary-text"){
+    if(msg.type === "summary_text"){
         summary_text(msg, sender, sendResponse);   
+    }else(if msg.type === "end_session"){
+        is_ongoing_session = false;
+        //TODO also change the display to look as if the user had already clicked finish
     }
 });
 
 /*
  * TODO get the page ID from the link data, not the session id from the stored information
  *
- * Clickingo n a keyword sends an ajax request to make the page legit.
+ * Clicking on a keyword sends an ajax request to make the page legit.
  */
 function keyword_click(event){
     let keyword_link = event.target;
@@ -154,38 +157,14 @@ function create_topic_submission_spinner(){
 }
 
 /*
- * Prevent the user from inadvertantly closing the window
+ * Prevent the user from inadvertantly closing the window.
  */
 let is_ongoing_session = false;
 
-async function _is_ongoing_session(){
-    let result_promise = new Promise(resolve =>{ chrome.storage.sync.get("end_time", result => {
-            if(!!result && !!result.end_time && new Date() < new Date(result.end_time)){
-                console.log("inside function says it's ongoing", new Date().getTime());
-                resolve(true);
-            }else{
-                console.log("inside function says it's not ongoing", new Date().getTime());
-                resolve(false);
-            }
-        });
-    });
-    let result = await result_promise;
-      
-    console.log("Got a result: ", result, new Date().getTime());
-    return result;
-}
- 
-
 
 window.onbeforeunload = function(){
-    //TODO put a message into the chat area since it probably won't show up in the popup;
-    //if(is_ongoing_session){
-    //    return "Closing this window will end your study session";
-    //}
-    let asdf = await _is_ongoing_session();
-    console.log("about to check for ongoing session");
-    if(_is_ongoing_session()){
-        return "closing this window will end your study session";
+    if(is_ongoing_session){
+        return "Closing this window will end your study session";
     }
 }
 
@@ -213,7 +192,7 @@ window.onload = function(){
         if(!!description){
             create_topic_submission_spinner();
             chrome.runtime.sendMessage({
-                "type": "topic-submit",
+                "type": "topic_submit",
                 "description": description + " . " + additional_keywords,
                 'additional_keywords': additional_keywords,
                 'duration': duration,
