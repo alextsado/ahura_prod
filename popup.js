@@ -86,6 +86,8 @@ function show_relevant_keywords(event){
  * Handle a summary text  message from the content page
  */
 function summary_text(msg, sender, sendResponse){
+    console.log("got the summary text");
+    console.log(msg, sender);
     let pkg = {
         "url": sender.url,
         "content": msg.message,
@@ -190,14 +192,14 @@ function set_user_name_get_user_id(user_name){
                 "Content-type": "application/json;charset=UTF-8"
             }
         }).then(response => {
-            if (!response.ok) {
-                reject(response.statusText);
-            }else{
+            if(response.ok){
                 chrome.storage.sync.set({
                     "user_name": user_name,
                     "user_id": response.json().user_id
                 });
                 resolve(response.json().user_id);
+            }else{
+                reject(response.statusText);
             }
         });
     });
@@ -270,18 +272,20 @@ window.onload = function(){
                 'duration': duration,
                 'time_started': time_started.getTime()
             }, function(response){
-                console.log("success! " + new Date().getTime());
+                console.log("got the response");
                 console.log(response);
+                //Remove the spinner so it doesn't show up later;
+                let topic_submission_spinner = document.querySelector("#topic_submission_spinner");
+                if(!!topic_submission_spinner){
+                    topic_submission_spinner.parentNode.removeChild(topic_submission_spinner);
+                }
+
                 if(!!response && !!response.success){
                     is_ongoing_session = true;
                     document.querySelector("#ongoing_study")
                         .style.display = "contents";
                     document.querySelector("#collection_content")
                         .style.display = "none";
-                    let topic_submission_spinner = document.querySelector("#topic_submission_spinner");
-                    if(!!topic_submission_spinner){
-                        topic_submission_spinner.parentNode.removeChild(topic_submission_spinner);
-                    }
                 }else{
                     if(!!response && !!response.error){
                         document.querySelector("#error_content").innerText = response.error;

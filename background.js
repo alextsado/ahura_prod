@@ -38,11 +38,12 @@ let chat_window = null;
 //chrome.storage.sync.remove('user_id', function(result){ console.log("removed user_id"); }); //only uncomment this line debugging if you have reset the DB.
 
 
-chrome.storage.sync.get(['user_id', 'user_name'], function(result){
-    if(!!result && !!result.user_id && result.user_id.length <= 1 && !!result.user_name && result.user_name.length <= 1) {
+chrome.storage.sync.get(['user_id', 'user_name'], result => {
+    if(!!result && !!result.user_id && result.user_id.length >= 1 && !!result.user_name && result.user_name.length >= 1){
         user_id = result.user_id;
         user_name = result.user_name;
-    } else {
+    }else{
+        console.log("results lacked either a user id or a user name: ", result);
         open_window();
     }
 });
@@ -94,31 +95,38 @@ chrome.windows.onRemoved.addListener(window_id => {
  */
 function topic_submit(msg, sender, sendResponse){
     console.log("got it " + new Date().getTime());
-    let pkg = {
-        "user_id": user_id,
-        "time_started": msg.time_started,
-        "description": msg.description,
-        "additional_keywords": msg.additional_keywords,
-        "duration": msg.duration
-    }
-    //TODO make sure that all of the @parameters from the API are in the pkg
-    console.log(pkg);
+    //TODO get the user_id from the storage.sync
+    chrome.storage.sync.get("user_id", results => {
+        if(!results || !results.user_id || results.user_id.length <= 0){
+            throw new Exception("There was no user id stored");
+        }
 
-    xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://13.59.94.191/sessions/")
-    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    xhr.responseType = "json";
-    let end_time = msg.time_started + msg.duration* 60000;
-
-    xhr.onreadystatechange = function() {
-        if(xhr.readyState === 4 && xhr.status < 299){
-            console.log("setting session_id to " + xhr.response.session_id);
-            keywords = xhr.response.keywords;
+        fetch("http://13.59.94.191/sessions/", {
+            body: JSON.stringify({
+                "user_id": results.user_id,
+                "time_started": msg.time_started,
+                "description": msg.description,
+                "additional_keywords": msg.additional_keywords,
+                "duration": msg.duration
+            }),
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8"
+            },
+            method: "post"
+        }).then(response => {
+            if(response.ok){
+                return response.json();
+            }else{
+                throw new Exception(response.statusText);
+            }
+        }).then(response => {
+            console.log("RESPONSE IS ", response);
+            let end_time = msg.time_started + msg.duration* 60000;
             chrome.storage.sync.set({
-                "session_id": xhr.response.session_id,
+                "session_id": response.session_id,
                 "end_time": end_time,
                 "description": msg.description,
-                "keywords": keywords}, result => {
+                "keywords": response.keywords}, result => {
                     console.log("saved session to disk " + new Date().getTime());
                     sendResponse({"success": true});
             });
@@ -126,15 +134,17 @@ function topic_submit(msg, sender, sendResponse){
             session_end_timer = setTimeout(function(){
                 //TODO message the window so that it can change the display of the session.
                 chrome.runtime.sendMessage({"type": "end_session"});
-                chrome.storage.sync.set({"session_id": null, "description": null, 
-                    "keywords": null, "end_time": null}, function(){
+                chrome.storage.sync.set({
+                    "session_id": null,
+                    "description": null, 
+                    "keywords": null,
+                    "end_time": null
+                }, function(){
                         console.log("saved session to disk");
                 });
             }, msg.duration*60000);
-        }
-    }
-    xhr.send(JSON.stringify(pkg));
-    console.log("about to return true " + new Date().getTime());
+        });
+    });
     return true;
 }
 
@@ -204,6 +214,7 @@ function stop_session(msg, sender, sendResponse){
     }
 
     chrome.storage.sync.get(["session_id", "end_time", "user_id"], results => {
+        console.log(results);
         if(!results || !results.session_id){
             throw new Exception("There is no session ID but we called STOP on it");
         }
