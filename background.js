@@ -139,8 +139,6 @@ function topic_submit(msg, sender, sendResponse){
                     "description": null, 
                     "keywords": null,
                     "end_time": null
-                }, function(){
-                        console.log("saved session to disk");
                 });
             }, msg.duration*60000);
         });
