@@ -42,13 +42,12 @@ function keyword_click(event){
         if(xhr.readyState === 4 && xhr.status <= 299){
             console.log("SUCCESS");
             //TODO remove all the keywords, the link, the instructions and change the url to green 
-            let del_me = keyword_link.closes("make_relevant_content");
-            del_me.parentNode.style.color = green;
+            let del_me = keyword_link.closest(".make_relevant_content");
+            del_me.parentNode.style.color = "green";
             del_me.parentNode.removeChild(del_me);
         }//TODO should handle failure?
     }
     xhr.send(JSON.stringify(pkg));
-
 
     return false;
 }
