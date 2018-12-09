@@ -114,13 +114,14 @@ function topic_submit(msg, sender, sendResponse){
             },
             method: "post"
         }).then(response => {
+            console.log("RAW RESPONSE IS ", response);
             if(response.ok){
                 return response.json();
             }else{
                 throw new Exception(response.statusText);
             }
         }).then(response => {
-            console.log("RESPONSE IS ", response);
+            console.log("RESPONSE JSON IS ", response);
             let end_time = msg.time_started + msg.duration* 60000;
             chrome.storage.sync.set({
                 "session_id": response.session_id,
@@ -141,6 +142,8 @@ function topic_submit(msg, sender, sendResponse){
                     "end_time": null
                 });
             }, msg.duration*60000);
+        }).catch(err => {
+            console.log("Fetch Failed: ", err);
         });
     });
     return true;

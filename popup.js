@@ -5,6 +5,8 @@
  * @Author Barnaby B.
  * @Since Nov 14, 2018
  */
+"use strict";
+import { submit_button_click } from "./topicSubmit.js";
 
 // ------------------------------------------
 // Routing
@@ -30,9 +32,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 window.onload = function(){
     setup_display();
 
-    document.querySelector("#user_name_submit").addEventListener("click",  event =>  user_name_click(event));
-    document.querySelector("#submit_button").addEventListener("click",     event =>  submit_button_click(event));
-    document.querySelector("#stop_session").addEventListener("click",      event =>  stop_session_click(event));
+    document.querySelector("#user_name_submit").addEventListener("click",
+        event =>  user_name_click(event));
+    document.querySelector("#submit_button").addEventListener("click",
+        event =>  submit_button_click(event, () => { is_ongoing_session = true; }));
+    document.querySelector("#stop_session").addEventListener("click",
+        event =>  stop_session_click(event));
     //handle dynamically added elements through bubbling
     document.querySelector("#add_pages_visited").addEventListener("click", event => {
         console.log("got a click in the add_pages_visited area");
@@ -226,24 +231,6 @@ function show_relevant_keywords(event){
     return false;
 }
 
-
-/*
- * Put a spinner on top of the submission form
- */
-function create_topic_submission_spinner(){
-    console.log("creating the topic submission_spinner");
-    let topic_submission_form = document.getElementById("collection_content");
-    let my_rect = topic_submission_form.getBoundingClientRect();
-    let spinner = document.createElement("img");
-    spinner.setAttribute("src", "spinner.gif");
-    spinner.setAttribute("id", "topic_submission_spinner");
-    spinner.style.position = "absolute";
-    spinner.style.top = my_rect.x;
-    spinner.style.left = my_rect.y;
-    spinner.style.width = "150px";
-    document.querySelector("body").append(spinner);
-}
-
 /*
  * AJAX call to set the users' name and to get an id from the server
  * @Param the users name
@@ -272,57 +259,6 @@ function set_user_name_get_user_id(user_name){
             }
         });
     });
-}
-
-/*
- * When a user clicks the submit button to start a new session
- */
-function submit_button_click(){
-    let time_started = new Date();
-    let description = document.querySelector("[name=description]").value
-    let additional_keywords = document.querySelector(
-        "[name=additional_keywords]").value;
-    let duration = document.querySelector("[name=duration]").value;
-    if(!!description){
-        create_topic_submission_spinner();
-        chrome.runtime.sendMessage({
-            "type": "topic_submit",
-            "description": description + " . " + additional_keywords,
-            'additional_keywords': additional_keywords,
-            'duration': duration,
-            'time_started': time_started.getTime()
-        }, function(response){
-            console.log("got the response");
-            console.log(response);
-            //Remove the spinner so it doesn't show up later;
-            let topic_submission_spinner = document.querySelector("#topic_submission_spinner");
-            if(!!topic_submission_spinner){
-                topic_submission_spinner.parentNode.removeChild(topic_submission_spinner);
-            }
-
-            if(!!response && !!response.success){
-                is_ongoing_session = true;
-                document.querySelector("#ongoing_study")
-                    .style.display = "contents";
-                document.querySelector("#collection_content")
-                    .style.display = "none";
-            }else{
-                if(!!response && !!response.error){
-                    document.querySelector("#error_content").innerText = response.error;
-                    document.querySelector("#error_content").style.display = "contents";
-                }else{
-                    document.querySelector("#error_content").innerText = "Unkown Error";
-                    document.querySelector("#error_content").style.display = "contents";
-                }
-            }
-            return true;
-        })
-    }else{
-        console.log("errors");
-        document.querySelector("#error_content")
-            .innerText = "Please fill out both form fields";
-        document.querySelector("#error_content").style.display = "contents";
-    }
 }
 
 function user_name_click(){
