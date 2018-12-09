@@ -52,6 +52,11 @@ window.onload = function(){
  */
 let is_ongoing_session = false;
 
+/*
+ * Media Library
+ */
+let media = new MediaLib();
+console.log(media);
 
 /*
  * Prevent the user from closing the window by accident 
