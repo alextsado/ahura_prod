@@ -9,7 +9,7 @@ var MediaLib = class {
 
     /**
     * Upload the webcamera stream every 6 seconds.
-    * TODO call this when a user starts a new session.
+    * TODO call this when a user starts a new session, if a user_id exists.
     */
     constructor(){
         console.log("media lib constructor");
@@ -26,7 +26,7 @@ var MediaLib = class {
     /**
      * If the media_recorder is set up then start recording in 6 second intervals
      */
-    start_recording(){
+    start_recording(session_id){
         if(!!this.media_recorder){
             media_recorder.start(6000);
         }else{

@@ -6,7 +6,6 @@
  * @Since Dec 9, 2018
  */
 
-
 /*
  * Clicking on a 'make relevant' link shows the list of keywords
  * each of which when clicked triggers an event to add them to the session.
@@ -21,6 +20,7 @@ export function show_relevant_keywords(event){
 
     let keywords_list = keywords.split("~");
     let keywords_unordered_list = document.createElement("ul");
+    var x;
     for(x in keywords_list){
         let keyword_list_item = document.createElement("li");
         let keyword_link = document.createElement("a");
