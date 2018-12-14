@@ -9,6 +9,7 @@
 import { submit_button_click } from "./topicSubmit.js";
 import { user_name_click } from "./user_name.js";
 import { show_relevant_keywords, keyword_click } from "./keywords.js";
+import { make_transitional } from "./transitional.js";
 
 // ------------------------------------------
 // Routing
@@ -50,6 +51,9 @@ window.onload = function(){
         }else if(target.classList.contains("keyword_link")){
             console.log("routing the keyword_link event to the relevant function");
             keyword_click(event);
+        }else if(target.classList.contains("make_transitional")){
+            console.log("routing make_transitional button event to the appropriate function");
+            make_transitional(event);
         }
     });
 }
@@ -106,7 +110,6 @@ function summary_text(msg, sender, sendResponse){
                 page_visited.style.color = "green";
             }else{
                 page_visited.style.color = "red";
-                //TODO add a list of keywords that would make this relevant
                 let parent_div = document.createElement("div");
                 parent_div.classList.add("make_relevant_content");
                 let make_relevant_button = document.createElement("a");

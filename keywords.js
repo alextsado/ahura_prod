@@ -9,6 +9,9 @@
 /*
  * Clicking on a 'make relevant' link shows the list of keywords
  * each of which when clicked triggers an event to add them to the session.
+ *
+ * TODO move this to using template literals for rendering new elements.
+ * TODO make a cancel button that deletes this list
  */
 export function show_relevant_keywords(event){
     let button_pressed = event.target;
@@ -33,13 +36,13 @@ export function show_relevant_keywords(event){
     }
     button_pressed.parentNode.append(keywords_unordered_list);
 
-    //TODO make a cancel button that deletes this list
     return false;
 }
 
 
 /*
  * TODO get the page ID from the link data, not the session id from the stored information
+ * TODO use fetch instead of xhr
  *
  * Clicking on a keyword sends an ajax request to make the page legit.
  */
@@ -69,4 +72,3 @@ export function keyword_click(event){
 
     return false;
 }
-

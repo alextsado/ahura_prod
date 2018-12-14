@@ -6,12 +6,17 @@
 -->
 <html>
     <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
         <script type="text/javascript" src="mediaLib.js"></script>
         <script type="module" src="popup.js"></script>
     </head>
-    <body>
-        <h2>Ahura AI</h2>
-        <div id="error_content" style="width: 400; display: none; color: red; font-weight: bold">
+    <body> <div class="container">
+            <div class="row">
+                <div class="col">
+                    <img src="ahura-blue.png" style="height: 100px; margin-top: 35px;" />
+                </div>
+            </div>
+        <div id="error_content alert alert-danger" style="width: 400; display: none; color: red; font-weight: bold">
             &nbsp;
         </div>
         <div id="user_name_form" style="width: 400; display: none;">
@@ -19,48 +24,47 @@
             <input id="user_name_input" name="user_name" style="width: 350px;" placeholder="Jane Smith">
             <button type="submit" value="Submit" id="user_name_submit">Submit</button>
         </div>
-        <div id="greeting">
-            Welcome <span id="user_name_greeting"> &nbsp; </span>.
+        <div id="greeting" class="row">
+            <div class="col">
+                <h3>
+                    Welcome <span id="user_name_greeting"> &nbsp; </span>.
+                </h3>
+            </div>
         </div>
-        <div id="collection_content" style="width: 400px;" id="creation_form">
-            <div>
-                <label for="description">
+        <div class="form-group" id="collection_content" style="width: 400px;">
+            <div class="row">
+                <label class="col" for="description">
                     Could you give me a short description of what you'd like to study today so that I can help you stick to it?
                 </label>
             </div>
 
-            <div>
-                <input name="description"
-                       style="width: 350px;"
-                        placeholder="For example: 'Origins of the electoral college.'">
-                </input>
+            <div class="row">
+                <div class="col">
+                    <input name="description" class="form-control"
+                            placeholder="For example: 'Origins of the electoral college.'">
+                    </input>
+                </div>
             </div>
-            <div>
-                <label for="keywords1">
-                    Would you like to add any additional keywords?
-                </label>
+            <div class="row" style="margin-top: 35px;">
+                <div class="col">
+                    <label for="duration">And how long would you like to study for?<label>
+                </div>
             </div>
-            <div>
-                <input name="additional_keywords"
-                       style="width: 350px;"
-                       placeholder="For example: 'Constitution'">
-                </input>
+            <div class="row">
+                <div class="col-8">
+                    <select class="form-control" id="duration" name="duration">
+                        <option value="5">5 Minutes</option>
+                        <option value="10">10 Minutes</option>
+                        <option value="15">15 Minutes</option>
+                        <option selected value="20">20 Minutes</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <button id="submit_button" type="submit" class="btn btn-primary" value="submit">
+                        Submit
+                    </button>
+                </div>
             </div>
-            <div>
-                <label for="duration">And how long would you like to study for?<label>
-            </div>
-            <div>
-                <select id="duration" name="duration">
-                    <option value="5">5 Minutes</option>
-                    <option value="10">10 Minutes</option>
-                    <option value="15">15 Minutes</option>
-                    <option selected value="20">20 Minutes</option>
-                </select>
-            </div>
-
-            <button id="submit_button" type="submit" value="submit">
-                Submit
-            </button>
         </div>
         <div style="width: 400; display: none;" id="ongoing_study">
              Alright, get to studying. I'll tell you when a page was off topic (feel free to correct me if it's on topic after all).
@@ -68,9 +72,8 @@
              <button id="stop_session">Ok Ms. Crabtree, I'm done.</button>
         </div>
 
-
         <div id="add_pages_visited">
             &nbsp;
         </div>
-    </body>
+    </div></body>
 </html>

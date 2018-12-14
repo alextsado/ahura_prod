@@ -14,15 +14,12 @@ export function submit_button_click(event, callback){
     console.log(callback);
     let time_started = new Date();
     let description = document.querySelector("[name=description]").value
-    let additional_keywords = document.querySelector(
-        "[name=additional_keywords]").value;
     let duration = document.querySelector("[name=duration]").value;
     if(!!description){
         create_topic_submission_spinner();
         chrome.runtime.sendMessage({
             "type": "topic_submit",
-            "description": description + " . " + additional_keywords,
-            'additional_keywords': additional_keywords,
+            "description": description, 
             'duration': duration,
             'time_started': time_started.getTime()
         }, function(response){
