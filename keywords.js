@@ -10,32 +10,31 @@
  * Clicking on a 'make relevant' link shows the list of keywords
  * each of which when clicked triggers an event to add them to the session.
  *
- * TODO move this to using template literals for rendering new elements.
- * TODO make a cancel button that deletes this list
+ * TODO make a cancel button that deletes this list from the page
  */
 export function show_relevant_keywords(event){
     let button_pressed = event.target;
     let keywords = button_pressed.getAttribute("noun_keywords");
-    let instruction_div = document.createElement("div");
-    instruction_div.append("Select which of these keywords make it relevant:");
-    button_pressed.parentNode.append(instruction_div);
-
-
     let keywords_list = keywords.split("~");
-    let keywords_unordered_list = document.createElement("ul");
-    var x;
-    for(x in keywords_list){
-        let keyword_list_item = document.createElement("li");
-        let keyword_link = document.createElement("a");
-        keyword_link.append(keywords_list[x]);
-        keyword_link.setAttribute("href", "#");
-        keyword_link.classList.add("keyword_link");
-        //keyword_link.addEventListener("click", keyword_click);
-        keyword_list_item.append(keyword_link);
-        keywords_unordered_list.append(keyword_list_item);
-    }
-    button_pressed.parentNode.append(keywords_unordered_list);
 
+
+    let instruction_div = `
+        <div class="row">
+            <div class="col">
+              Select which of these keywords make it relevant:
+            </div>
+        </div>
+        <div class="row">
+            ${keywords_list.map( keyword => ` 
+                <div class="col-6">
+                    <a href="#" class="keyword_link">
+                        ${keyword}
+                    </a>
+                </div>
+            `).join('')}
+        </div>
+    `
+    button_pressed.parentNode.insertAdjacentHTML('afterend', instruction_div);
     return false;
 }
 
