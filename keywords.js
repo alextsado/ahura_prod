@@ -19,25 +19,37 @@ export function show_relevant_keywords(event){
 
 
     let instruction_div = `
-        <div class="row">
-            <div class="col">
-              Select which of these keywords make it relevant:
-            </div>
-        </div>
-        <div class="row">
-            ${keywords_list.map( keyword => ` 
-                <div class="col-6">
-                    <a href="#" class="keyword_link">
-                        ${keyword}
-                    </a>
+        <div class="keyword_wrapper">
+            <div class="row">
+                <div class="col">
+                  Select which of these keywords make it relevant:
                 </div>
-            `).join('')}
+                <div class="col">
+                    <button type="button" class="btn btn-secondary cancel_button">Cancel</button>
+                </div>
+            </div>
+            <div class="row">
+                ${keywords_list.map( keyword => ` 
+                    <div class="col-6">
+                        <a href="#" class="keyword_link">
+                            ${keyword}
+                        </a>
+                    </div>
+                `).join('')}
+            </div>
         </div>
     `
     button_pressed.parentNode.insertAdjacentHTML('afterend', instruction_div);
     return false;
 }
 
+/*
+ * Remove the whole added list of keywords after the cancel button is clicked.
+ */
+export function keyword_cancel_click(event){
+    let cancel_button = event.target;
+    cancel_button.closest(".keyword_wrapper").remove();
+}
 
 /*
  * TODO get the page ID from the link data, not the session id from the stored information

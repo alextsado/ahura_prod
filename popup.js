@@ -8,7 +8,7 @@
 "use strict";
 import { submit_button_click } from "./topicSubmit.js";
 import { user_name_click } from "./user_name.js";
-import { show_relevant_keywords, keyword_click } from "./keywords.js";
+import { show_relevant_keywords, keyword_click, keyword_cancel_click } from "./keywords.js";
 import { make_transitional } from "./transitional.js";
 
 // ------------------------------------------
@@ -41,19 +41,18 @@ window.onload = function(){
         event =>  submit_button_click(event, () => { is_ongoing_session = true; }));
     document.querySelector("#stop_session").addEventListener("click",
         event =>  stop_session_click(event));
+
     //handle dynamically added elements through bubbling
     document.querySelector("#add_pages_visited").addEventListener("click", event => {
-        console.log("got a click in the add_pages_visited area");
         let target = event.target;
         if(target.classList.contains("make_relevant_button")){
-            console.log("routing the make_relevant button event to the appropriate function");
             show_relevant_keywords(event);
         }else if(target.classList.contains("keyword_link")){
-            console.log("routing the keyword_link event to the relevant function");
             keyword_click(event);
         }else if(target.classList.contains("make_transitional")){
-            console.log("routing make_transitional button event to the appropriate function");
             make_transitional(event);
+        }else if(target.classList.contains("cancel_button")){
+            keyword_cancel_click(event);
         }
     });
 }
@@ -106,24 +105,51 @@ function summary_text(msg, sender, sendResponse){
             page_visited.append(sender.url)
             page_visited.classList.add("page_history");
             page_visited.setAttribute("page_id", xhr.response.page_id);
+            let page_visited_template = "";
             if(xhr.response.is_relevant){
-                page_visited.style.color = "green";
+                page_visited_template = `
+                    <div class="alert alert-success row" 
+                    style="font-size: 12px; overflow: hidden; white-space: nowrap;">
+                        ${sender.url}
+                    </div>
+                `
             }else{
-                page_visited.style.color = "red";
-                let parent_div = document.createElement("div");
-                parent_div.classList.add("make_relevant_content");
-                let make_relevant_button = document.createElement("a");
-                make_relevant_button.setAttribute("href", "#");
-                make_relevant_button.classList.add("make_relevant_button");
-                make_relevant_button.append("Make relevant");
-                make_relevant_button.setAttribute("noun_keywords", xhr.response.keywords);
-                parent_div.append(make_relevant_button);
-                page_visited.append(parent_div);
-
-
-                //TODO make a TRANSITIONAL PAGE button as well.
+                let keyword_string = xhr.response.keywords;
+                page_visited_template = `
+                    <div class="alert alert-warning row">
+                        <div class="row">
+                        <div class="col-8"
+                        style="font-size: 12px; overflow: hidden; white-space: nowrap;">
+                            ${sender.url}
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-secondary">
+                                Ignore
+                            </button>
+                        </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 align-self-end">
+                                <button class="btn btn-success make_relevant_button"
+                                    type="button" noun_keywords="${keyword_string}">
+                                    Make Relevant
+                                </button>
+                    </div>
+                `
+                //page_visited.style.color = "red";
+                //let parent_div = document.createElement("div");
+                //parent_div.classList.add("make_relevant_content");
+                //let make_relevant_button = document.createElement("a");
+                //make_relevant_button.setAttribute("href", "#");
+                //make_relevant_button.classList.add("make_relevant_button");
+                //make_relevant_button.append("Make relevant");
+                //make_relevant_button.setAttribute("noun_keywords", xhr.response.keywords);
+                //parent_div.append(make_relevant_button);
+                //page_visited.append(parent_div);
             }
-            document.querySelector("#add_pages_visited").append(page_visited);
+            //document.querySelector("#add_pages_visited").append(page_visited);
+            document.querySelector("#add_pages_visited").insertAdjacentHTML(
+                "afterend", page_visited_template);
         }
     }
 
