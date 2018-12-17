@@ -1,6 +1,5 @@
 /**
  * Control the popup page
- * TODO separate this into multiple files so that's it's less difficult to manage
  *
  * @Author Barnaby B.
  * @Since Nov 14, 2018

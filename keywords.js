@@ -10,7 +10,6 @@
  * Clicking on a 'make relevant' link shows the list of keywords
  * each of which when clicked triggers an event to add them to the session.
  *
- * TODO make a cancel button that deletes this list from the page
  */
 export function show_relevant_keywords(event){
     let button_pressed = event.target;
