@@ -11,11 +11,18 @@
  * change the display to show the URL in gray without buttons.
  */
 export function make_transitional(event){
-    let button_pressed = event.target;
-    let page_id = "GET THE ID"; //TODO get the page ID
+    const button_pressed = event.target;
+    const pli = button_pressed.closest(".page_list_item")
+    const page_id = pli.getAttribute("page_id")
 
     fetch("http://13.59.94.191/pages/${page_id}/", {
-            method: "post"
+            method: "post",
+            body: JSON.stringify({
+                "is_transitional": true
+            }),
+            headers: {
+                "Content-type": "application/json;charset=UTF-8"
+            }
         }).then(response => {
             console.log("RAW RESPONSE IS ", response);
             if(response.ok){
@@ -31,7 +38,11 @@ export function make_transitional(event){
  * remove both buttons.
  */
 function change_link_to_transitional(button_pressed){
-    throw new Exception("Not implemented yet");
+    let page_link = button_pressed.closest(".page_list_item");
+    let plad = page_link.querySelector(".page_list_buttons_div");
+    plad.parentNode.removeChild(plad);
+    page_link.classList.remove("alert-warning");
+    page_link.classList.add("alert-dark");
 }
 
 /*

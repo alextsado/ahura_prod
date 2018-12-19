@@ -48,7 +48,7 @@ window.onload = function(){
             show_relevant_keywords(event);
         }else if(target.classList.contains("keyword_link")){
             keyword_click(event);
-        }else if(target.classList.contains("make_transitional")){
+        }else if(target.classList.contains("make_transitional_button")){
             make_transitional(event);
         }else if(target.classList.contains("cancel_button")){
             keyword_cancel_click(event);
