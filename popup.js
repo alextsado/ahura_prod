@@ -89,7 +89,9 @@ function summary_text(msg, sender, sendResponse){
     let pkg = {
         "url": sender.url,
         "content": msg.message,
-        "load_time": msg.load_time
+        "load_time": msg.load_time,
+        "is_relevant": true,
+        "tab_id": sender.tab.id
     }
     let xhr = new XMLHttpRequest();
 
@@ -100,55 +102,43 @@ function summary_text(msg, sender, sendResponse){
                 "keywords": xhr.response.keywords,
                 "page_id": xhr.response.page_id
             });
-            let page_visited = document.createElement("div")
-            page_visited.append(sender.url)
-            page_visited.classList.add("page_history");
-            page_visited.setAttribute("page_id", xhr.response.page_id);
+
+            const page_id = xhr.response.page_id;
             let page_visited_template = "";
-            if(xhr.response.is_relevant){
+            if(xhr.response.is_transitional){
                 page_visited_template = `
-                    <div class="alert alert-success row" 
-                    style="font-size: 12px; overflow: hidden; white-space: nowrap;">
-                        ${sender.url}
+                    <div class="alert alert-dark row page_list_item" page_id="${page_id}"> 
+                        <div class="row">
+                            ${sender.url}
+                        </div>
                     </div>
                 `
+            }else if(xhr.response.is_relevant){
+                page_visited_template = `
+                    <div class="alert alert-success row page_list_item" page_id="${page_id}">
+                        <div class="row">
+                            ${sender.url}
+                        </div>
+                    </div>                `
             }else{
                 let keyword_string = xhr.response.keywords;
                 page_visited_template = `
-                    <div class="alert alert-warning row">
+                    <div class="alert alert-warning row page_list_item row" page_id="${page_id}">
                         <div class="row">
-                        <div class="col-8"
-                        style="font-size: 12px; overflow: hidden; white-space: nowrap;">
                             ${sender.url}
                         </div>
-                        <div class="col">
-                            <button type="button" class="btn btn-secondary">
-                                Ignore
-                            </button>
-                        </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-4 align-self-end">
-                                <button class="btn btn-success make_relevant_button"
-                                    type="button" noun_keywords="${keyword_string}">
-                                    Make Relevant
-                                </button>
+                    <div style="width: 100%" class="page_list_buttons_div">
+                        <a href="#" class="make_transitional_button">
+                            Ignore
+                        </a>
+                        <a href="#" class="make_relevant_button" noun_keywords="${keyword_string}">
+                            Make Relevant
+                        </a>
                     </div>
                 `
-                //page_visited.style.color = "red";
-                //let parent_div = document.createElement("div");
-                //parent_div.classList.add("make_relevant_content");
-                //let make_relevant_button = document.createElement("a");
-                //make_relevant_button.setAttribute("href", "#");
-                //make_relevant_button.classList.add("make_relevant_button");
-                //make_relevant_button.append("Make relevant");
-                //make_relevant_button.setAttribute("noun_keywords", xhr.response.keywords);
-                //parent_div.append(make_relevant_button);
-                //page_visited.append(parent_div);
             }
-            //document.querySelector("#add_pages_visited").append(page_visited);
             document.querySelector("#add_pages_visited").insertAdjacentHTML(
-                "afterend", page_visited_template);
+                "beforeend", page_visited_template);
         }
     }
 

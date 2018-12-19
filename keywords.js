@@ -19,13 +19,9 @@ export function show_relevant_keywords(event){
 
     let instruction_div = `
         <div class="keyword_wrapper">
+            <hr style="width: 100%" />
             <div class="row">
-                <div class="col">
-                  Select which of these keywords make it relevant:
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-secondary cancel_button">Cancel</button>
-                </div>
+              Select which of these keywords make it relevant:
             </div>
             <div class="row">
                 ${keywords_list.map( keyword => ` 
@@ -35,6 +31,9 @@ export function show_relevant_keywords(event){
                         </a>
                     </div>
                 `).join('')}
+            </div>
+            <div class="row">
+                <button type="button" class="btn btn-secondary cancel_button">Cancel</button>
             </div>
         </div>
     `
@@ -59,10 +58,10 @@ export function keyword_cancel_click(event){
 export function keyword_click(event){
     let keyword_link = event.target;
     let new_keyword = keyword_link.innerText;
-    let page_id = keyword_link.closest(".page_history").getAttribute("page_id");
+    let page_id = keyword_link.closest(".page_list_item").getAttribute("page_id");
     console.log("keyword clicked: " + new_keyword);
     console.log("page_id: " + page_id);
-    let pkg = {"new_keyword": new_keyword}
+    let pkg = {"new_keyword": new_keyword, "is_relevant": true}
 
     let xhr = new XMLHttpRequest();
     xhr.open("POST", "http://13.59.94.191/pages/" + page_id + "/");
@@ -71,10 +70,12 @@ export function keyword_click(event){
 
     xhr.onreadystatechange = function(){
         if(xhr.readyState === 4 && xhr.status <= 299){
-            console.log("SUCCESS");
-            //TODO remove all the keywords, the link, the instructions and change the url to green 
-            let del_me = keyword_link.closest(".make_relevant_content");
-            del_me.parentNode.style.color = "green";
+            let page_link = keyword_link.closest(".page_list_item");
+            let plad = page_link.querySelector(".page_list_buttons_div");
+            plad.parentNode.removeChild(plad);
+            page_link.classList.remove("alert-warning");
+            page_link.classList.add("alert-success");
+            let del_me = keyword_link.closest(".keyword_wrapper");
             del_me.parentNode.removeChild(del_me);
         }//TODO should handle failure?
     }
