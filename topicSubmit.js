@@ -7,12 +7,13 @@
  * @Since Nov 9, 2018
  */
 
-import { media } from "./mediaLib";
+import { media } from "./mediaLib.js";
+import { globals } from "./globals.js";
 
 /*
  * When a user clicks the submit button to start a new session
  */
-export function submit_button_click(event, callback){
+export function submit_button_click(event){
     let time_started = new Date();
     let description = document.querySelector("[name=description]").value
     let duration = document.querySelector("[name=duration]").value;
@@ -40,14 +41,15 @@ function show_error_text(error = "Unknown Error"){
 
 
 
-function set_session_id_remove_spinner(session_id, media, callback){
+function set_session_id_remove_spinner(session_id){
     //Remove the spinner so it doesn't show up later;
     let topic_submission_spinner = document.querySelector("#topic_submission_spinner");
     if(!!topic_submission_spinner){
         topic_submission_spinner.parentNode.removeChild(topic_submission_spinner);
     }
     media.session_id = session_id;
-    callback();
+    media.start_recording();
+    globals.is_ongoing_session = true;
     document.querySelector("#ongoing_study").style.display = "contents";
     document.querySelector("#collection_content").style.display = "none";
 }
@@ -106,7 +108,8 @@ function topic_submit(msg){
                 /*
                  * set the session_end timer to end in the correct number of minutes
                  */
-                session_end_timer = setTimeout(function(){
+                console.log("setting session_end_timer");
+                globals.session_end_timer = setTimeout(function(){
                     chrome.runtime.sendMessage({"type": "end_session"});
                     chrome.storage.sync.set({
                         "session_id": null,
@@ -125,7 +128,7 @@ function topic_submit(msg){
                         console.log("saved session to disk " + new Date().getTime());
                         resolve(response.session_id);
                 });
-            });
+            }).catch(error => alert(error));
         });
     });
 }

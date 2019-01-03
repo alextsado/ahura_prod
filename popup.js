@@ -5,6 +5,7 @@
  * @Since Nov 14, 2018
  */
 "use strict";
+import { globals } from "./globals.js";
 import { media } from "./mediaLib.js";
 import { submit_button_click } from "./topicSubmit.js";
 import { user_name_click } from "./user_name.js";
@@ -23,7 +24,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if(msg.type === "summary_text"){
         summary_text(msg, sender, sendResponse);   
     }else if(msg.type === "end_session"){
-        is_ongoing_session = false;
+        globals.is_ongoing_session = false;
         media.stop_recording();
         document.querySelector("#ongoing_study").style.display = "none";
         document.querySelector("#collection_content").style.display = "contents";
@@ -39,7 +40,7 @@ window.onload = function(){
     document.querySelector("#user_name_submit").addEventListener("click",
         event =>  user_name_click(event));
     document.querySelector("#submit_button").addEventListener("click",
-        event =>  submit_button_click((event), () => { is_ongoing_session = true; }));
+        event =>  submit_button_click(event));
     document.querySelector("#stop_session").addEventListener("click",
         event =>  stop_session_click(event));
 
@@ -59,16 +60,11 @@ window.onload = function(){
 }
 
 /*
- * Prevent the user from inadvertantly closing the window.
- */
-let is_ongoing_session = false;
-
-/*
  * Prevent the user from closing the window by accident 
  * if they have a session going on
  */
 window.onbeforeunload = function(){
-    if(is_ongoing_session){
+    if(globals.is_ongoing_session){
         return "Closing this window will end your study session";
     }
 }
@@ -171,7 +167,7 @@ function stop_session_click(){
         "stop_time": stop_time.getTime(),
     }, response => {
         if(!!response && !!response.success){
-            is_ongoing_session = false;
+            globals.is_ongoing_session = false;
             document.querySelector("#ongoing_study").style.display = "none";
             document.querySelector("#collection_content").style.display = "contents";
         }else{

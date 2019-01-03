@@ -1,12 +1,10 @@
+'use strict';
 /**
  * singleton for dealing with Media in the window
  *
  * @Author Barnaby B.
  * @Since Nov 28th 2018
  */
-
-export let media = new MediaLib();
-
 var MediaLib = class {
 
 
@@ -22,7 +20,7 @@ var MediaLib = class {
         navigator.mediaDevices.getUserMedia({audio: true, video: true}).then(stream=>{
           this.media_recorder = new MediaRecorder(stream);
           this.media_recorder.ondataavailable = e => {
-              upload_blob(e.data);
+              this.upload_blob(e.data);
           }
         });
     }
@@ -42,6 +40,7 @@ var MediaLib = class {
      * If the media_recorder is set up then start recording in 6 second intervals
      */
     start_recording(session_id){
+        console.log("starting recording");
         if(!!this.media_recorder){
             this.media_recorder.start(6000);
         }else{
@@ -69,7 +68,9 @@ var MediaLib = class {
         const post_url = "https://devapi.spentaai.com/vid/${this._user_id}/${this._session_id}/${timestamp}"
         const form_data = new FormData();
         form_data.append("file", video_data)
-        fetch(post_url, {body: form_data});
+        fetch(post_url, {method: "post", body: form_data});
          
     }
 }
+
+export let media = new MediaLib();

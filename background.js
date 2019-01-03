@@ -6,6 +6,9 @@
  * @Since Nov 12, 2018
  */
 
+"use strict";
+import { globals } from "./globals.js";
+
 /*
  * Route messages from other parts of the app accordingly.
  * TODO move "topic_submit" out of messages, and just let the window handle it
@@ -20,15 +23,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
 
 /*
- * Generate a random user ID in case one doesn't already exist
- */
-let session_end_timer = null;
-
-
-/*
  * Get the browser ID and users name
  */
-let user_id = null;
+let user_id, user_name = null;
 let chat_window = null;
 //chrome.storage.sync.remove('user_id', function(result){ console.log("removed user_id"); }); //only uncomment this line debugging if you have reset the DB.
 
@@ -132,7 +129,7 @@ function summary_text(msg, sender, sendResponse){
  * TODO this should also handle when a user closes the window.
  */
 function stop_session(msg, sender, sendResponse){
-    session_end_timer = null;
+    globals.session_end_timer = null;
     let session_id = null;
     let pkg = {
         "user_id": user_id,
