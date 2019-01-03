@@ -5,6 +5,7 @@
  * @Since Nov 14, 2018
  */
 "use strict";
+import { media } from "./mediaLib.js";
 import { submit_button_click } from "./topicSubmit.js";
 import { user_name_click } from "./user_name.js";
 import { show_relevant_keywords, keyword_click, keyword_cancel_click } from "./keywords.js";
@@ -23,6 +24,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         summary_text(msg, sender, sendResponse);   
     }else if(msg.type === "end_session"){
         is_ongoing_session = false;
+        media.stop_recording();
         document.querySelector("#ongoing_study").style.display = "none";
         document.querySelector("#collection_content").style.display = "contents";
     }
@@ -37,7 +39,7 @@ window.onload = function(){
     document.querySelector("#user_name_submit").addEventListener("click",
         event =>  user_name_click(event));
     document.querySelector("#submit_button").addEventListener("click",
-        event =>  submit_button_click(event, () => { is_ongoing_session = true; }));
+        event =>  submit_button_click((event), () => { is_ongoing_session = true; }));
     document.querySelector("#stop_session").addEventListener("click",
         event =>  stop_session_click(event));
 
@@ -60,11 +62,6 @@ window.onload = function(){
  * Prevent the user from inadvertantly closing the window.
  */
 let is_ongoing_session = false;
-
-/*
- * Media Library
- */
-let media = new MediaLib();
 
 /*
  * Prevent the user from closing the window by accident 
@@ -202,9 +199,10 @@ function setup_display(){
         }
         //TODO try to do the import of the user_name functionality here instead of at the top
         //If it's the first time then there's no username and no user id
-        if(!!result && !!result.user_name && result.user_name.length >= 1){
+        if(!!result && !!result.user_name && result.user_name.length >= 1 && !!result.user_id && result.user_id.length >= 1){
             console.log("There is a username", result.user_name);
             document.querySelector("#user_name_greeting").innerText = result.user_name;
+            media.user_name = result.user_id;
         }else{ //There is no username 
             document.querySelector("#collection_content").style.display = "none";
             document.querySelector("#greeting").style.display = "none";

@@ -11,13 +11,8 @@
  * TODO move "topic_submit" out of messages, and just let the window handle it
  */
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    //message from newly submitted form
-    if(msg.type === "topic_submit"){
-        topic_submit(msg, sender, sendResponse);
-    }
-   
     //Stop the session
-    else if(msg.type === "stop_session"){
+    if(msg.type === "stop_session"){
         stop_session(msg, sender, sendResponse);
     }
     return true;
@@ -89,65 +84,6 @@ chrome.windows.onRemoved.addListener(window_id => {
         chat_window = null;
     }
 });
-
-/*
- * Handle a topic submission from the popup page.
- */
-function topic_submit(msg, sender, sendResponse){
-    console.log("got it " + new Date().getTime());
-    //TODO get the user_id from the storage.sync
-    chrome.storage.sync.get("user_id", results => {
-        if(!results || !results.user_id || results.user_id.length <= 0){
-            throw new Exception("There was no user id stored");
-        }
-
-        fetch("http://13.59.94.191/sessions/", {
-            body: JSON.stringify({
-                "user_id": results.user_id,
-                "time_started": msg.time_started,
-                "description": msg.description,
-                "additional_keywords": msg.additional_keywords,
-                "duration": msg.duration
-            }),
-            headers: {
-                "Content-Type": "application/json;charset=UTF-8"
-            },
-            method: "post"
-        }).then(response => {
-            console.log("RAW RESPONSE IS ", response);
-            if(response.ok){
-                return response.json();
-            }else{
-                throw new Exception(response.statusText);
-            }
-        }).then(response => {
-            console.log("RESPONSE JSON IS ", response);
-            let end_time = msg.time_started + msg.duration* 60000;
-            chrome.storage.sync.set({
-                "session_id": response.session_id,
-                "end_time": end_time,
-                "description": msg.description,
-                "keywords": response.keywords}, result => {
-                    console.log("saved session to disk " + new Date().getTime());
-                    sendResponse({"success": true});
-            });
-
-            session_end_timer = setTimeout(function(){
-                //TODO message the window so that it can change the display of the session.
-                chrome.runtime.sendMessage({"type": "end_session"});
-                chrome.storage.sync.set({
-                    "session_id": null,
-                    "description": null, 
-                    "keywords": null,
-                    "end_time": null
-                });
-            }, msg.duration*60000);
-        }).catch(err => {
-            console.log("Fetch Failed: ", err);
-        });
-    });
-    return true;
-}
 
 
 /*

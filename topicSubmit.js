@@ -7,54 +7,49 @@
  * @Since Nov 9, 2018
  */
 
+import { media } from "./mediaLib";
+
 /*
  * When a user clicks the submit button to start a new session
  */
 export function submit_button_click(event, callback){
-    console.log(callback);
     let time_started = new Date();
     let description = document.querySelector("[name=description]").value
     let duration = document.querySelector("[name=duration]").value;
+    document.querySelector("#error_content").style.display = "none";
     if(!!description){
         create_topic_submission_spinner();
-        chrome.runtime.sendMessage({
-            "type": "topic_submit",
+        topic_submit({
             "description": description, 
             'duration': duration,
             'time_started': time_started.getTime()
-        }, function(response){
-            console.log("got the response");
-            console.log(response);
-            //Remove the spinner so it doesn't show up later;
-            let topic_submission_spinner = document.querySelector("#topic_submission_spinner");
-            if(!!topic_submission_spinner){
-                topic_submission_spinner.parentNode.removeChild(topic_submission_spinner);
-            }
-
-            if(!!response && !!response.success){
-                //is_ongoing_session = true;
-                callback();
-                document.querySelector("#ongoing_study")
-                    .style.display = "contents";
-                document.querySelector("#collection_content")
-                    .style.display = "none";
-            }else{
-                if(!!response && !!response.error){
-                    document.querySelector("#error_content").innerText = response.error;
-                    document.querySelector("#error_content").style.display = "contents";
-                }else{
-                    document.querySelector("#error_content").innerText = "Unkown Error";
-                    document.querySelector("#error_content").style.display = "contents";
-                }
-            }
-            return true;
-        })
+        }).then(set_session_id_remove_spinner, show_error_text);
     }else{
-        console.log("errors");
-        document.querySelector("#error_content")
-            .innerText = "Please fill out both form fields";
-        document.querySelector("#error_content").style.display = "contents";
+        show_error_text("Please fill out both form fields");
     }
+    return false;
+}
+
+/*
+ * Display the given error, or a default text, in the pages error display
+ */
+function show_error_text(error = "Unknown Error"){
+    document.querySelector("#error_content").innerText = error;
+    document.querySelector("#error_content").style.display = "contents";
+}
+
+
+
+function set_session_id_remove_spinner(session_id, media, callback){
+    //Remove the spinner so it doesn't show up later;
+    let topic_submission_spinner = document.querySelector("#topic_submission_spinner");
+    if(!!topic_submission_spinner){
+        topic_submission_spinner.parentNode.removeChild(topic_submission_spinner);
+    }
+    media.session_id = session_id;
+    callback();
+    document.querySelector("#ongoing_study").style.display = "contents";
+    document.querySelector("#collection_content").style.display = "none";
 }
 
 /*
@@ -72,4 +67,65 @@ function create_topic_submission_spinner(){
     spinner.style.left = my_rect.y;
     spinner.style.width = "150px";
     document.querySelector("body").append(spinner);
+}
+
+
+
+/*
+ * Handle a topic submission from the popup page.
+ */
+function topic_submit(msg){
+    console.log("msg is");
+    console.log(msg);
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.get("user_id", results => {
+            if(!results || !results.user_id || results.user_id.length <= 0){
+                throw new Exception("There was no user id stored in this app.");
+            }
+
+            fetch("http://13.59.94.191/sessions/", {
+                body: JSON.stringify({
+                    "user_id": results.user_id,
+                    "time_started": msg.time_started,
+                    "description": msg.description,
+                    "additional_keywords": msg.additional_keywords,
+                    "duration": msg.duration
+                }),
+                headers: {
+                    "Content-Type": "application/json;charset=UTF-8"
+                },
+                method: "post"
+            }).then(response => {
+                if(response.ok){
+                    return response.json();
+                }else{
+                    throw new Exception(response.statusText);
+                }
+            }).then(response => {
+
+                /*
+                 * set the session_end timer to end in the correct number of minutes
+                 */
+                session_end_timer = setTimeout(function(){
+                    chrome.runtime.sendMessage({"type": "end_session"});
+                    chrome.storage.sync.set({
+                        "session_id": null,
+                        "description": null, 
+                        "keywords": null,
+                        "end_time": null
+                    });
+                }, msg.duration*60000);
+
+                let end_time = msg.time_started + msg.duration* 60000;
+                chrome.storage.sync.set({
+                    "session_id": response.session_id,
+                    "end_time": end_time,
+                    "description": msg.description,
+                    "keywords": response.keywords}, result => {
+                        console.log("saved session to disk " + new Date().getTime());
+                        resolve(response.session_id);
+                });
+            });
+        });
+    });
 }
