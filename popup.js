@@ -28,6 +28,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         media.stop_recording();
         document.querySelector("#ongoing_study").style.display = "none";
         document.querySelector("#collection_content").style.display = "contents";
+        return {"success": true}
     }
 });
 
@@ -198,7 +199,7 @@ function setup_display(){
         if(!!result && !!result.user_name && result.user_name.length >= 1 && !!result.user_id && result.user_id.length >= 1){
             console.log("There is a username", result.user_name);
             document.querySelector("#user_name_greeting").innerText = result.user_name;
-            media.user_name = result.user_id;
+            media.user_id = result.user_id;
         }else{ //There is no username 
             document.querySelector("#collection_content").style.display = "none";
             document.querySelector("#greeting").style.display = "none";

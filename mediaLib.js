@@ -41,6 +41,9 @@ var MediaLib = class {
      */
     start_recording(session_id){
         console.log("starting recording");
+        if(!this._user_id){
+            alert("No user id");
+        }
         if(!!this.media_recorder){
             this.media_recorder.start(6000);
         }else{
@@ -53,9 +56,13 @@ var MediaLib = class {
      */
     stop_recording(){
         if(!!this.media_recorder){
-            this.media_recorder.stop();
+            try{
+                this.media_recorder.stop();
+            }catch(e){
+                this.media_recorder = null;
+            }
         }else{
-            alert("failed to stop recording because no media recorder exists");
+            console.log("failed to stop recording because no media recorder exists");
         }
     }
 
@@ -65,10 +72,15 @@ var MediaLib = class {
      */
     upload_blob(video_data){
         const timestamp = new Date().getTime();
-        const post_url = "https://devapi.spentaai.com/vid/${this._user_id}/${this._session_id}/${timestamp}"
+        const post_url = `http://13.59.94.191/video/${this._user_id}/${this._session_id}/${timestamp}/`
         const form_data = new FormData();
-        form_data.append("file", video_data)
-        fetch(post_url, {method: "post", body: form_data});
+        form_data.append("video_file", video_data)
+        fetch(post_url, {method: "post", body: form_data}).then(response => {
+            if(!response || !response.ok){
+                document.querySelector("#error_content").innerText = "The video upload is failing. Data is not being collected.";
+                document.querySelector("#error_content").style.display = "contents";
+            }
+        });
          
     }
 }

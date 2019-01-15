@@ -8,6 +8,8 @@
  * @Since Nov 9, 2018
  */
 
+import { media } from "./mediaLib.js";
+
 /*
  * AJAX call to set the users' name and to get an id from the server
  * @Param the users name
@@ -25,15 +27,20 @@ function set_user_name_get_user_id(user_name){
                 "Content-type": "application/json;charset=UTF-8"
             }
         }).then(response => {
+            console.log("got a response");
             if(response.ok){
-                chrome.storage.sync.set({
-                    "user_name": user_name,
-                    "user_id": response.json().user_id
-                });
-                resolve(response.json().user_id);
-            }else{
-                reject(response.statusText);
+                return response.json();
             }
+        }).then( response => {
+            console.log("response is ", response);
+            media.user_id = response.user_id;
+            chrome.storage.sync.set({
+                "user_name": user_name,
+                "user_id": response.user_id
+            });
+            resolve(response.user_id);
+        }).catch( err => {
+            reject(err);
         });
     });
 }

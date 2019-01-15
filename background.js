@@ -8,6 +8,7 @@
 
 "use strict";
 import { globals } from "./globals.js";
+import { media } from "./mediaLib.js";
 
 /*
  * Route messages from other parts of the app accordingly.
@@ -16,7 +17,7 @@ import { globals } from "./globals.js";
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     //Stop the session
     if(msg.type === "stop_session"){
-        stop_session(msg, sender, sendResponse);
+        return stop_session(msg, sender, sendResponse);
     }
     return true;
 });
@@ -129,6 +130,7 @@ function summary_text(msg, sender, sendResponse){
  * TODO this should also handle when a user closes the window.
  */
 function stop_session(msg, sender, sendResponse){
+    media.stop_recording();
     globals.session_end_timer = null;
     let session_id = null;
     let pkg = {
@@ -139,12 +141,14 @@ function stop_session(msg, sender, sendResponse){
 
     xhr.onreadystatechange = function() {
         if(xhr.readyState === 4 && xhr.status <= 299){
+            media.stop_recording();
             chrome.storage.sync.set({
                 "session_id": null,
                 "end_time": null
             });
+            console.log("returning success");
+            sendResponse({"success": true});
         }
-        sendResponse({"success": true});
     }
 
     chrome.storage.sync.get(["session_id", "end_time", "user_id"], results => {
