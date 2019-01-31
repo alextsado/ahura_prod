@@ -7,11 +7,20 @@
 <html>
     <head>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <script src="tf/jquery-2.1.1.min.js"></script>
         <script src="tf/face-api.js"></script>
         <script src="tf/drawing.js"></script>
-        <script src="tf/faceDetectorSelect.js"></script>
+        <script src="tf/faceDetectionControls.js"></script>
+        <script src="tf/inlineScript.js"></script>
         <script type="module" src="popup.js"></script>
         <style>
+            #inputVideo {
+                height: 300px;
+            }
+            #overlay {
+                position: absolute;
+                height: 300px;
+            }
             .page_list_item {
                 font-size: 11px;
                 overflow: hidden;
@@ -60,6 +69,12 @@
                 </h3>
             </div>
         </div>
+        <div id="tf_canvas" class="row">
+          <video id="inputVideo" autoplay muted></video>
+          <canvas id="overlay" />
+        </div>
+
+
         <div class="form-group" id="collection_content" style="width: 400px;">
             <div class="row">
                 <label class="col" for="description">
