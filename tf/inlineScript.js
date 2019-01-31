@@ -40,7 +40,7 @@ async function onPlay() {
   const result1 = await faceapi.detectSingleFace(videoEl, options).withFaceExpressions()
   
   try {
-	console.log(howDoIFeel(result1))
+	$("#emotion_display").text(howDoIFeel(result1)["expression"]);
   }
   catch(err) {
 	console.log(err)
