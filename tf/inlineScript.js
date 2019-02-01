@@ -73,8 +73,6 @@ async function run() {
 function updateResults() {}
 
 $(document).ready(function() {
-  var inputVideo = $("#inputVideo");
-  inputVideo.on("play", onPlay);
   initFaceDetectionControls()
   run()
 })

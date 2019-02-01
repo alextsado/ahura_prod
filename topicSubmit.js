@@ -15,8 +15,14 @@ import { globals } from "./globals.js";
  */
 export function submit_button_click(event){
     let time_started = new Date();
+    //TODO remove jQuery!!!
+     var inputVideo = $("#inputVideo");
+     inputVideo.on("play", onPlay);
+
     let description = document.querySelector("[name=description]").value
     let duration = document.querySelector("[name=duration]").value;
+    document.querySelector("#tf_canvas").style.display = "contents";
+    document.querySelector("#tf_emotion").style.display = "contents";
     document.querySelector("#error_content").style.display = "none";
     if(!!description){
         create_topic_submission_spinner();

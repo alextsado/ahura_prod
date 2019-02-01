@@ -67,8 +67,8 @@ function open_window(){
             url: chrome.runtime.getURL("popup.html"),
             type: "popup",
             "focused": true,
-            "width": 550,
-            "height": 850
+            "width": 1020,
+            "height": 600
         }, win => {
             chat_window = win;
         });

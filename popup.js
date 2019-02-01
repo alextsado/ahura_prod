@@ -24,6 +24,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if(msg.type === "summary_text"){
         summary_text(msg, sender, sendResponse);   
     }else if(msg.type === "end_session"){
+        console.log("called end_session");
         globals.is_ongoing_session = false;
         media.stop_recording();
         document.querySelector("#ongoing_study").style.display = "none";
@@ -36,6 +37,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
  * Set up event listeners
  */
 window.onload = function(){
+    fetch("http://13.59.94.191/ping_when_plugin_opened/", {method: "get"})
     setup_display();
 
     document.querySelector("#user_name_submit").addEventListener("click",
@@ -167,6 +169,7 @@ function stop_session_click(){
         "type": "stop_session",
         "stop_time": stop_time.getTime(),
     }, response => {
+        media.stop_recording();
         if(!!response && !!response.success){
             globals.is_ongoing_session = false;
             document.querySelector("#ongoing_study").style.display = "none";

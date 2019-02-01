@@ -55,10 +55,15 @@ var MediaLib = class {
      * If the recorder is set up then stop recording
      */
     stop_recording(){
+        console.log("Called stop recording");
         if(!!this.media_recorder){
+            console.log("has a media recroder");
             try{
+                console.log("about to stop media");
                 this.media_recorder.stop();
+                console.log("stopped media");
             }catch(e){
+                console.log("media stop FAILED");
                 this.media_recorder = null;
             }
         }else{

@@ -7,73 +7,30 @@
 <html>
     <head>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <link rel="stylesheet" href="ahura.css">
         <script src="tf/jquery-2.1.1.min.js"></script>
         <script src="tf/face-api.js"></script>
         <script src="tf/drawing.js"></script>
         <script src="tf/faceDetectionControls.js"></script>
         <script src="tf/inlineScript.js"></script>
         <script type="module" src="popup.js"></script>
-        <style>
-            #inputVideo {
-                height: 300px;
-            }
-            #overlay {
-                position: absolute;
-                height: 300px;
-            }
-            .page_list_item {
-                font-size: 11px;
-                overflow: hidden;
-                white-space: nowrap;
-                margin-top: 5px;
-                margin-bottom: 0px;
-                padding-top: 0.5rem; 
-                padding-bottom: 0.5rem;
-            }
-            .make_transitional_button {
-                margin-top: -20px;
-                position: relative;
-                background-color: #ffeeba;
-                float: right;
-                margin-right: 75px;
-                font-size: 10px;
-            }            
-            .make_relevant_button {
-                margin-top: -20px;
-                position: relative;
-                background-color: #ffeeba;
-                float: right;
-                margin-right: 0px;
-                font-size: 10px;
-            }
-        </style>
     </head>
-    <body> <div class="container">
-            <div class="row">
-                <div class="col">
-                    <img src="ahura-blue.png" style="height: 100px; margin-top: 35px;" />
-                </div>
-            </div>
+    <body> 
+<div id="enter_query_container">
+    <div class="container" >
         <div id="error_content" class="alert alert-danger" style="width: 400; display: none; color: red; font-weight: bold">
             &nbsp;
         </div>
-        <div id="user_name_form" style="width: 400; display: none;">
+        <div id="user_name_form" style="display: none;">
             <h3>Hi. My name is Ms. Crabtree, your new tutor. What's your name?</h3>
             <input id="user_name_input" name="user_name" style="width: 350px;" placeholder="Jane Smith">
             <button type="submit" value="Submit" id="user_name_submit">Submit</button>
         </div>
-        <div id="greeting" class="row">
-            <div class="col">
-                <h3>
-                    Welcome <span id="user_name_greeting"> &nbsp; </span>.
-                </h3>
-            </div>
-        </div>
-        <div id="tf_canvas" class="row">
+        <div id="tf_canvas" class="row" style="display: none;">
           <video id="inputVideo" autoplay muted></video>
           <canvas id="overlay" />
         </div>
-        <div id="tf_emotion" class="row">
+        <div id="tf_emotion" class="row" style="display: none;">
             <div class="col-6">
                 You are currently:
             </div>
@@ -82,42 +39,66 @@
             </div>
         </div>
 
+  <div class="row">
+      <div class="col-3">
+          &nbsp;
+      </div>
 
-        <div class="form-group" id="collection_content" style="width: 400px;">
+        <div class="form-group col-6" id="collection_content">
             <div class="row">
+                <div class="col">
+                    <img src="ahura_logo.png" style="height: 100px; margin-top: 35px;" />
+                </div>
+            </div>
+            <div id="greeting" class="row">
+                <div class="col">
+                    <h3>
+                        Welcome <span id="user_name_greeting"> &nbsp; </span>.
+                    </h3>
+                </div>
+            </div>
+                <div class="row">
                 <label class="col" for="description">
-                    Could you give me a short description of what you'd like to study today so that I can help you stick to it?
+                    Type in a brief description of your study in the field below
                 </label>
             </div>
 
             <div class="row">
-                <div class="col">
-                    <input name="description" class="form-control"
-                            placeholder="For example: 'Origins of the electoral college.'">
-                    </input>
-                </div>
+                    <textarea name="description" class="form-control enter_shadow"
+                             placeholder="Example: 'Origins of the electoral college.'" ></textarea>
             </div>
             <div class="row" style="margin-top: 35px;">
                 <div class="col">
-                    <label for="duration">And how long would you like to study for?<label>
+                    <label for="duration">
+                        From the dropdown below select how many minutes you want to spend studying.
+                    <label>
                 </div>
             </div>
-            <div class="row">
+            <div class="row justify-content-md-center">
                 <div class="col-8">
-                    <select class="form-control" id="duration" name="duration">
+                    <select class="form-control enter_shadow" id="duration" name="duration">
                         <option value="5">5 Minutes</option>
                         <option value="10">10 Minutes</option>
                         <option value="15">15 Minutes</option>
                         <option selected value="20">20 Minutes</option>
                     </select>
                 </div>
-                <div class="col">
+            </div>
+            <div class="row justify-content-md-center">
+                <div class="col-4">
                     <button id="submit_button" type="submit" class="btn btn-primary" value="submit">
-                        Submit
+                        Start
                     </button>
                 </div>
             </div>
+
         </div>
+            <div id="enter_image_content" class="col-3">
+                <img src="login_asset.png" id="login_asset">
+            </div>
+
+
+
         <div style="width: 400; display: none;" id="ongoing_study">
              Alright, get to studying. I'll tell you when a page was off topic (feel free to correct me if it's on topic after all).
              <br/>
@@ -128,4 +109,5 @@
             &nbsp;
         </div>
     </div></body>
+</div>
 </html>
