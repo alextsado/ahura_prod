@@ -56,13 +56,14 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 function open_window(){
     if(!!chat_window){
         try{
-            chrome.windows.update(chat_window.id, { "focused": true });  
+            chrome.windows.update(chat_window.id, {"focused": true });  
         }catch(e){
             console.log(e);
             chat_window = null;
         }
     }
     if(!chat_window){
+        fetch("http://13.59.94.191/ping_when_plugin_opened/", {method: "get"})
         //TODO check whether there is a username. If no username then open user_name.html, otherwise enter_topic.htl
         chrome.storage.sync.get(["user_id"], results => {
             console.log("got the user_id: " + results.user_id);

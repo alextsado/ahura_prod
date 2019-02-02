@@ -10,6 +10,26 @@
 
 import { media } from "./mediaLib.js";
 
+
+/*
+ * Set up event listeners
+ */
+window.onload = function(){
+    document.querySelector("#user_name_submit").addEventListener("click",
+        event =>  user_name_click(event));
+}
+
+
+/*
+ * Prevent the user from closing the window by accident 
+ * if they have a session going on
+ */
+window.onbeforeunload = function(){
+    if(globals.is_ongoing_session){
+        return "Closing this window will end your study session";
+    }
+}
+
 /*
  * AJAX call to set the users' name and to get an id from the server
  * @Param the users name

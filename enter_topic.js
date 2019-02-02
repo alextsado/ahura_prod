@@ -1,27 +1,46 @@
 /**
- * Handle the submission of a new topic inside of the window
+ * Control the page for entering the topic
  *
  * @Author Barnaby B.
- * @Since Nov 9, 2018
+ * @Since Nov 14, 2018
  */
-
-import { media } from "./mediaLib.js";
+"use strict";
 import { globals } from "./globals.js";
+
+// ------------------------------------------
+// Routing
+// -------------------------------------------------
+
+/*
+ * Set up event listeners
+ */
+window.onload = function(){
+    document.querySelector("#submit_button").addEventListener("click",
+        event =>  submit_button_click(event));
+    //TODO check sync and then change the window location to the ongoing page
+}
+
+/*
+ * Prevent the user from closing the window by accident 
+ * if they have a session going on
+ */
+window.onbeforeunload = null;
+    
 
 /*
  * When a user clicks the submit button to start a new session
  */
-export function submit_button_click(event){
+function submit_button_click(event){
     let time_started = new Date();
     //TODO remove jQuery!!!
-     var inputVideo = $("#inputVideo");
-     inputVideo.on("play", onPlay);
+     //var inputVideo = $("#inputVideo");
+     //inputVideo.on("play", onPlay);
 
     let description = document.querySelector("[name=description]").value
     let duration = document.querySelector("[name=duration]").value;
-    document.querySelector("#tf_canvas").style.display = "contents";
-    document.querySelector("#tf_emotion").style.display = "contents";
-    document.querySelector("#error_content").style.display = "none";
+    //document.querySelector("#tf_canvas").style.display = "contents";
+    //document.querySelector("#tf_emotion").style.display = "contents";
+    //document.querySelector("#error_content").style.display = "none";
     if(!!description){
         create_topic_submission_spinner();
         topic_submit({
@@ -51,11 +70,13 @@ function set_session_id_remove_spinner(session_id){
     if(!!topic_submission_spinner){
         topic_submission_spinner.parentNode.removeChild(topic_submission_spinner);
     }
-    media.session_id = session_id;
-    media.start_recording();
+    //TODO set the session id in sync and redirect
+    //media.session_id = session_id;
+    //media.start_recording();
     globals.is_ongoing_session = true;
-    document.querySelector("#ongoing_study").style.display = "contents";
-    document.querySelector("#collection_content").style.display = "none";
+    //document.querySelector("#ongoing_study").style.display = "contents";
+    //document.querySelector("#collection_content").style.display = "none";
+    document.location = "popup.html";
 }
 
 /*
