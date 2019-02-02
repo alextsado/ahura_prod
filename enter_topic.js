@@ -25,7 +25,7 @@ window.onload = function(){
         user_name = result.user_name;
         user_id = result.user_id;
         document.querySelector("#user_name_greeting").innerText = result.user_name;
-    }
+    })
 }
 
 /*
@@ -84,7 +84,7 @@ function set_session_id_remove_spinner(session_id){
     globals.is_ongoing_session = true;
     //document.querySelector("#ongoing_study").style.display = "contents";
     //document.querySelector("#collection_content").style.display = "none";
-    document.location = "popup.html";
+    document.location = "research.html";
 }
 
 /*

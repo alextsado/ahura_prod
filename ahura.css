@@ -3,11 +3,11 @@ h3 {
     font-size: 1.1rem;
 }
 #inputVideo {
-    height: 300px;
+    height: 250px;
 }
 #overlay {
     position: absolute;
-    height: 300px;
+    height: 250px;
 }
 .page_list_item {
     font-size: 11px;
@@ -34,7 +34,11 @@ h3 {
     margin-right: 0px;
     font-size: 10px;
 }
-#login_asset {
+#session_asset {
+    margin-top: -70px;
+    margin-left: 125px;
+    width: 220px;
+}#login_asset {
     margin-top: 80px;
     margin-left: -100px;
     width: 300px;
@@ -50,7 +54,7 @@ h3 {
     height: 100%;
     background-image: linear-gradient(to bottom right, white, #c9c6ec);
 }
-#submit_button, #user_name_submit {
+#stop_session, #submit_button, #user_name_submit {
     background-image: linear-gradient(to bottom right, #33b38e, #0393aa);
     margin-top: 35px;
     width: 100%;
