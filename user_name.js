@@ -9,7 +9,7 @@
  */
 
 import { media } from "./mediaLib.js";
-
+import { globals } from "./globals.js";
 
 /*
  * Set up event listeners
@@ -24,11 +24,7 @@ window.onload = function(){
  * Prevent the user from closing the window by accident 
  * if they have a session going on
  */
-window.onbeforeunload = function(){
-    if(globals.is_ongoing_session){
-        return "Closing this window will end your study session";
-    }
-}
+window.onbeforeunload = null;
 
 /*
  * AJAX call to set the users' name and to get an id from the server
@@ -78,11 +74,7 @@ export function user_name_click(){
     }else{ //username is good
         console.log("username is ", user_name);
         set_user_name_get_user_id(user_name).then( user_id => {
-            console.log(user_id);
-            document.getElementById("user_name_form").style.display = "none";
-            document.querySelector("#user_name_greeting").innerText = user_name;
-            document.getElementById("greeting").style.display = "contents";
-            document.getElementById("collection_content").style.display = "contents";
+            window.location = "enter_topic.html";
         }).catch( err => {
             console.log(err);
             //TODO something on the UI to show that the AJAX call failed

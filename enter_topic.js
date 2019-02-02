@@ -10,6 +10,8 @@ import { globals } from "./globals.js";
 // ------------------------------------------
 // Routing
 // -------------------------------------------------
+let user_name = null;
+let user_id = null;
 
 /*
  * Set up event listeners
@@ -17,7 +19,13 @@ import { globals } from "./globals.js";
 window.onload = function(){
     document.querySelector("#submit_button").addEventListener("click",
         event =>  submit_button_click(event));
-    //TODO check sync and then change the window location to the ongoing page
+
+    chrome.storage.sync.get(["user_name", "user_id"], result => {
+        //TODO if user_name or user_id are null then go back to the enter-username page
+        user_name = result.user_name;
+        user_id = result.user_id;
+        document.querySelector("#user_name_greeting").innerText = result.user_name;
+    }
 }
 
 /*

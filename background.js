@@ -9,6 +9,7 @@
 "use strict";
 import { globals } from "./globals.js";
 import { media } from "./mediaLib.js";
+//TODO don't import media or make it so that importing it doesn't turn on the camera
 
 /*
  * Route messages from other parts of the app accordingly.
@@ -68,7 +69,7 @@ function open_window(){
         chrome.storage.sync.get(["user_id"], results => {
             console.log("got the user_id: " + results.user_id);
             let open_url;
-            if(!!results && !!results.user_id){
+            if(!results && !!results.user_id){
                 open_url = "enter_topic.html";
             }else{
                 open_url = "user_name.html";
