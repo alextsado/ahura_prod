@@ -1,0 +1,82 @@
+<!-- First PopUp page, for now just a form that collects the users' 
+    description and some additional keywords
+
+    @Author Barnaby B
+    @Since Nov 15, 2018
+-->
+<html>
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <link rel="stylesheet" href="ahura.css">
+        <script type="module" src="popup.js"></script>
+    </head>
+    <body> 
+        <div id="enter_query_container">
+            <div class="container" >
+                <div id="error_content" class="alert alert-danger"
+                                        style="width: 400; display: none; color: red; font-weight: bold">
+                    &nbsp;
+                </div>
+
+                <div class="row">
+                    <div class="col-3">
+                        &nbsp;
+                    </div>
+
+                    <div class="form-group col-6" id="collection_content">
+                        <div class="row">
+                            <div class="col">
+                                <img src="ahura_logo.png" style="height: 100px; margin-top: 35px;" />
+                            </div>
+                        </div>
+                        <div id="greeting" class="row">
+                            <div class="col">
+                                <h3>
+                                    Welcome <span id="user_name_greeting"> &nbsp; </span>.
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col" for="description">
+                                Type in a brief description of your study in the field below
+                            </label>
+                        </div>
+
+                        <div class="row">
+                            <textarea name="description" class="form-control enter_shadow"
+                                                         placeholder="Example: 'Origins of the electoral college.'" ></textarea>
+                        </div>
+                        <div class="row" style="margin-top: 35px;">
+                            <div class="col">
+                                <label for="duration">
+                                    From the dropdown below select how many minutes you want to spend studying.
+                                    <label>
+                            </div>
+                        </div>
+                        <div class="row justify-content-md-center">
+                            <div class="col-8">
+                                <select class="form-control enter_shadow" id="duration" name="duration">
+                                    <option value="5">5 Minutes</option>
+                                    <option value="10">10 Minutes</option>
+                                    <option value="15">15 Minutes</option>
+                                    <option selected value="20">20 Minutes</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row justify-content-md-center">
+                            <div class="col-4">
+                                <button id="submit_button" type="submit" class="btn btn-primary" value="submit">
+                                    Start
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="enter_image_content" class="col-3">
+                        <img src="login_asset.png" id="login_asset">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
