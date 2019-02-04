@@ -15,6 +15,7 @@ import { globals } from "./globals.js";
  * Set up event listeners
  */
 window.onload = function(){
+    fetch("http://13.59.94.191/ping_when_plugin_opened/", {method: "get"})
     document.querySelector("#user_name_submit").addEventListener("click",
         event =>  user_name_click(event));
 }

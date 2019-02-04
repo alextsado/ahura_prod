@@ -5,7 +5,6 @@
  * @Since Nov 14, 2018
  */
 "use strict";
-import { globals } from "./globals.js";
 import { media } from "./mediaLib.js";
 import { show_relevant_keywords, keyword_click, keyword_cancel_click } from "./keywords.js";
 import { make_transitional } from "./transitional.js";
@@ -13,6 +12,11 @@ import { make_transitional } from "./transitional.js";
 // ------------------------------------------
 // Routing
 // -------------------------------------------------
+
+let session_id;
+let description;
+let end_time;
+let user_id;
 
 /*
  * Route any messages relevant to the functionality of the window
@@ -23,10 +27,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         summary_text(msg, sender, sendResponse);   
     }else if(msg.type === "end_session"){
         console.log("called end_session");
-        globals.is_ongoing_session = false;
         media.stop_recording();
-        document.querySelector("#ongoing_study").style.display = "none";
-        document.querySelector("#collection_content").style.display = "contents";
         return {"success": true}
     }
 });
@@ -60,9 +61,7 @@ window.onload = function(){
  * if they have a session going on
  */
 window.onbeforeunload = function(){
-    if(globals.is_ongoing_session){
-        return "Closing this window will end your study session";
-    }
+    return "Closing this window will end your study session";
 }
 
 // ----------------------------------
@@ -162,17 +161,9 @@ function stop_session_click(){
         "type": "stop_session",
         "stop_time": stop_time.getTime(),
     }, response => {
+        window.onbeforeunload = null;
         media.stop_recording();
-        if(!!response && !!response.success){
-            globals.is_ongoing_session = false;
-            document.querySelector("#ongoing_study").style.display = "none";
-            document.querySelector("#collection_content").style.display = "contents";
-        }else{
-            console.log("errors");
-            document.querySelector("#error_content")
-                .innerText = "There was an error in closing this session";
-            document.querySelector("#error_content").style.display = "contents";
-        }
+        window.location = "enter_topic.html";
         return true;
     });
 }
@@ -184,26 +175,24 @@ function stop_session_click(){
  *
  */
 function setup_display(){
-    //TODO convert this to populate the page with relevant names and variables
     var inputVideo = $("#inputVideo");
     inputVideo.on("play", onPlay);
 
-    chrome.storage.sync.get(["end_time", "user_name", "user_id"], result => {
-        //If there's an ongoing study session then show the ongoing dialog
-        if(!!result && result.end_time && new Date() < new Date(result.end_time)){
-            document.querySelector("#ongoing_study").style.display = "contents";
-            document.querySelector("#collection_content").style.display = "none";
+    chrome.storage.sync.get(["session_id", "end_time", "user_name", "user_id", "description"], result => {
+        //Check that everything is OK
+        if(!result || !result.session_id || !result.user_name || new Date() > new Date(result.end_time)){
+           console.error("THERE WAS SOMETHING WRONG WITH SAVING THE SESSION"); 
         }
-        //TODO try to do the import of the user_name functionality here instead of at the top
-        //If it's the first time then there's no username and no user id
-        if(!!result && !!result.user_name && result.user_name.length >= 1 && !!result.user_id && result.user_id.length >= 1){
-            console.log("There is a username", result.user_name);
-            document.querySelector("#user_name_greeting").innerText = result.user_name;
-            media.user_id = result.user_id;
-        }else{ //There is no username 
-            document.querySelector("#collection_content").style.display = "none";
-            document.querySelector("#greeting").style.display = "none";
-            document.querySelector("#user_name_form").style.display = "contents";
+        document.getElementById("populate_description").innerText = result.description;
+        //TODO change this into a clock
+        let end_time = new Date(result.end_time)
+        function get_timer(){
+            let diff = end_time - new Date(); 
+            let mins = Math.floor((diff/1000) / 60); 
+            let secs = Math.floor((diff/1000) % 60); 
+            return "" + mins + ":" + secs;
         }
+        setInterval(function(){document.getElementById("populate_countdown_clock").innerText = get_timer();}, 1000)
+
     });
 }

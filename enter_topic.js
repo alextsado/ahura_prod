@@ -17,6 +17,7 @@ let user_id = null;
  * Set up event listeners
  */
 window.onload = function(){
+    fetch("http://13.59.94.191/ping_when_plugin_opened/", {method: "get"})
     document.querySelector("#submit_button").addEventListener("click",
         event =>  submit_button_click(event));
 
@@ -55,7 +56,9 @@ function submit_button_click(event){
             "description": description, 
             'duration': duration,
             'time_started': time_started.getTime()
-        }).then(set_session_id_remove_spinner, show_error_text);
+        }).then(function(session_id){
+            document.location = "research.html";
+        }, show_error_text);
     }else{
         show_error_text("Please fill out both form fields");
     }
@@ -72,6 +75,7 @@ function show_error_text(error = "Unknown Error"){
 
 
 
+/*
 function set_session_id_remove_spinner(session_id){
     //Remove the spinner so it doesn't show up later;
     let topic_submission_spinner = document.querySelector("#topic_submission_spinner");
@@ -82,10 +86,9 @@ function set_session_id_remove_spinner(session_id){
     //media.session_id = session_id;
     //media.start_recording();
     globals.is_ongoing_session = true;
-    //document.querySelector("#ongoing_study").style.display = "contents";
-    //document.querySelector("#collection_content").style.display = "none";
     document.location = "research.html";
 }
+*/
 
 /*
  * Put a spinner on top of the submission form
@@ -150,7 +153,7 @@ function topic_submit(msg){
                         "keywords": null,
                         "end_time": null
                     });
-                }, msg.duration*60000);
+                }, msg.duration*600000);
 
                 let end_time = msg.time_started + msg.duration* 60000;
                 chrome.storage.sync.set({
