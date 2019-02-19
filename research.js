@@ -17,6 +17,7 @@ let session_id;
 let description;
 let end_time;
 let user_id;
+let session_end_timer;
 
 /*
  * Route any messages relevant to the functionality of the window
@@ -72,9 +73,9 @@ window.onbeforeunload = function(){
  * Handle a summary text  message from the content page
  */
 function summary_text(msg, sender, sendResponse){
-    console.log("got the summary text");
     console.log(msg, sender);
     let pkg = {
+        "doc_title": msg.doc_title,
         "url": sender.url,
         "content": msg.message,
         "load_time": msg.load_time,
@@ -96,7 +97,10 @@ function summary_text(msg, sender, sendResponse){
             if(xhr.response.is_transitional){
                 page_visited_template = `
                     <div class="alert alert-dark row page_list_item" page_id="${page_id}"> 
-                        <div class="row">
+                        <div class="row history_title">
+                            ${msg.doc_title}
+                        </div>
+                        <div class="row history_url">
                             ${sender.url}
                         </div>
                     </div>
@@ -104,7 +108,10 @@ function summary_text(msg, sender, sendResponse){
             }else if(xhr.response.is_relevant){
                 page_visited_template = `
                     <div class="alert alert-success row page_list_item" page_id="${page_id}">
-                        <div class="row">
+                        <div class="row history_title">
+                            ${msg.doc_title}
+                        </div>
+                        <div class="row history_url">
                             ${sender.url}
                         </div>
                     </div>                `
@@ -112,7 +119,10 @@ function summary_text(msg, sender, sendResponse){
                 let keyword_string = xhr.response.keywords;
                 page_visited_template = `
                     <div class="alert alert-warning row page_list_item row" page_id="${page_id}">
-                        <div class="row">
+                        <div class="row history_title">
+                            ${msg.doc_title}
+                        </div>
+                        <div class="row history_url">
                             ${sender.url}
                         </div>
                     <div style="width: 100%" class="page_list_buttons_div">
@@ -126,7 +136,7 @@ function summary_text(msg, sender, sendResponse){
                 `
             }
             document.querySelector("#add_pages_visited").insertAdjacentHTML(
-                "beforeend", page_visited_template);
+                "afterbegin", page_visited_template); //afterbegin prepends it, beforeend appends
         }
     }
 
@@ -184,7 +194,8 @@ function setup_display(){
            console.error("THERE WAS SOMETHING WRONG WITH SAVING THE SESSION"); 
         }
         document.getElementById("populate_description").innerText = result.description;
-        //TODO change this into a clock
+        
+        // calculate how much time is left in the session
         let end_time = new Date(result.end_time)
         function get_timer(){
             let diff = end_time - new Date(); 
@@ -192,7 +203,23 @@ function setup_display(){
             let secs = Math.floor((diff/1000) % 60); 
             return "" + mins + ":" + secs;
         }
+        
+        //Update the clock every second using the above calculations
         setInterval(function(){document.getElementById("populate_countdown_clock").innerText = get_timer();}, 1000)
+
+        // set the session_end timer to end in the correct number of minutes
+        console.log("setting session_end_timer");
+        let duration = end_time - new Date(); 
+        session_end_timer = setTimeout(function(){
+            chrome.runtime.sendMessage({"type": "end_session"});
+            chrome.storage.sync.set({
+                "session_id": null,
+                "description": null, 
+                "keywords": null,
+                "end_time": null
+            });
+            window.location = "enter_topic.html";
+        }, duration*600000);
 
     });
 }

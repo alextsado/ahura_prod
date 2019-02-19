@@ -38,10 +38,12 @@ h3 {
     margin-top: -70px;
     margin-left: 125px;
     width: 220px;
+    opacity: 0.3;
 }#login_asset {
     margin-top: 80px;
     margin-left: -100px;
     width: 300px;
+    opacity: 0.3;
 }
 .enter_shadow {
     box-shadow: 0px 0px 29px #888;
@@ -59,4 +61,11 @@ h3 {
     margin-top: 35px;
     width: 100%;
     color: white;
+}
+.history_title {
+    width: 100%;
+}
+.history_url {
+    width: 100%;
+    font-size: 8px;
 }

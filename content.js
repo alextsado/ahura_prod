@@ -22,7 +22,7 @@ chrome.storage.sync.get(["end_time", "session_id"], results => {
  * analyzed for relevance
  */
 function ahura_go(results){
-    let content_start, first_h1, first_h2, doc_body, first_500;
+    let content_start, first_h1, first_h2, doc_body, first_500, doc_title;
     if(!!document.querySelector("h1")){
         first_h1 = document.querySelector("h1").innerText;
     }
@@ -31,6 +31,12 @@ function ahura_go(results){
     }
     if(!!document.querySelector("body")){
         doc_body = document.querySelector("body").innerText;
+    }
+
+    if(!!document.title){
+        doc_title = document.title;
+    }else{
+        doc_title = "";
     }
 
     if(!!doc_body){
@@ -58,6 +64,7 @@ function ahura_go(results){
     }
     chrome.runtime.sendMessage({
         type: "summary_text",
+        doc_title: doc_title,
         session_id: results.session_id,
         message: first_500,
         load_time: load_time.getTime()

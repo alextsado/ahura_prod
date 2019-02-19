@@ -141,20 +141,6 @@ function topic_submit(msg){
                 }
             }).then(response => {
 
-                /*
-                 * set the session_end timer to end in the correct number of minutes
-                 */
-                console.log("setting session_end_timer");
-                globals.session_end_timer = setTimeout(function(){
-                    chrome.runtime.sendMessage({"type": "end_session"});
-                    chrome.storage.sync.set({
-                        "session_id": null,
-                        "description": null, 
-                        "keywords": null,
-                        "end_time": null
-                    });
-                }, msg.duration*600000);
-
                 let end_time = msg.time_started + msg.duration* 60000;
                 chrome.storage.sync.set({
                     "session_id": response.session_id,
