@@ -117,6 +117,7 @@ function summary_text(msg, sender, sendResponse){
                     </div>                `
             }else{
                 let keyword_string = xhr.response.keywords;
+                let rand_id = "make_relevant_" + Math.round(Math.random()*100000);
                 page_visited_template = `
                     <div class="alert alert-warning row page_list_item row" page_id="${page_id}">
                         <div class="row history_title">
@@ -129,7 +130,7 @@ function summary_text(msg, sender, sendResponse){
                         <a href="#" class="make_transitional_button">
                             Ignore
                         </a>
-                        <a href="#" class="make_relevant_button" noun_keywords="${keyword_string}">
+                        <a href="#" class="make_relevant_button" id="${rand_id}" noun_keywords="${keyword_string}">
                             Make Relevant
                         </a>
                     </div>
@@ -201,6 +202,9 @@ function setup_display(){
             let diff = end_time - new Date(); 
             let mins = Math.floor((diff/1000) / 60); 
             let secs = Math.floor((diff/1000) % 60); 
+            if(secs < 10){
+                secs = "0" + secs;
+            }
             return "" + mins + ":" + secs;
         }
         
@@ -210,6 +214,7 @@ function setup_display(){
         // set the session_end timer to end in the correct number of minutes
         console.log("setting session_end_timer");
         let duration = end_time - new Date(); 
+        console.log(duration);
         session_end_timer = setTimeout(function(){
             chrome.runtime.sendMessage({"type": "end_session"});
             chrome.storage.sync.set({
@@ -219,7 +224,7 @@ function setup_display(){
                 "end_time": null
             });
             window.location = "enter_topic.html";
-        }, duration*600000);
+        }, duration);
 
     });
 }

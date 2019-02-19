@@ -9,11 +9,14 @@
 /*
  * Clicking on a 'make relevant' link shows the list of keywords
  * each of which when clicked triggers an event to add them to the session.
+ * disable the 'make relevant button'
  *
  */
 export function show_relevant_keywords(event){
     let button_pressed = event.target;
     let keywords = button_pressed.getAttribute("noun_keywords");
+    let rand_id = button_pressed.getAttribute("id");
+    button_pressed.classList.add("isDisabled");
     let keywords_list = keywords.split("~");
 
 
@@ -33,7 +36,7 @@ export function show_relevant_keywords(event){
                 `).join('')}
             </div>
             <div class="row">
-                <button type="button" class="btn btn-secondary cancel_button">Cancel</button>
+                <button type="button" rand_id="${rand_id}" class="btn btn-secondary cancel_button">Cancel</button>
             </div>
         </div>
     `
@@ -43,9 +46,12 @@ export function show_relevant_keywords(event){
 
 /*
  * Remove the whole added list of keywords after the cancel button is clicked.
+ * re-enable the 'make-relevant' button.
  */
 export function keyword_cancel_click(event){
     let cancel_button = event.target;
+    let rand_id = cancel_button.getAttribute("rand_id");
+    document.getElementById(rand_id).classList.remove("isDisabled");
     cancel_button.closest(".keyword_wrapper").remove();
 }
 

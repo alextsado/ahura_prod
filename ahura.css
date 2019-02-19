@@ -69,3 +69,10 @@ h3 {
     width: 100%;
     font-size: 8px;
 }
+.isDisabled {
+    color: currentColor;
+    cursor: not-allowed;
+    opacity: 0.5;
+    text-decoration: none;
+    pointer-events: none;
+}
