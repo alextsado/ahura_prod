@@ -223,6 +223,7 @@ function setup_display(){
                 "keywords": null,
                 "end_time": null
             });
+            window.onbeforeunload = null;
             window.location = "enter_topic.html";
         }, duration);
 
