@@ -1,10 +1,14 @@
  {
-    "name": "Ahura AI Data Collection",
-    "version": "0.1",
-    "description": "Collect data in order to train an AI that can predict when you're about to get distracted based on your facial expressions!",
+    "name": "Ahura AI Pomodoro Demo",
+    "short_name": "Ahura Demo",
+    "version": "0.1.1",
+    "default_locale": "en",
+    "author": "Ahura AI",
+    "homepage_url": "www.ahuraai.com",
+    "description": "This is the demo release of Ahura AI's Technology, packaged as a Pomodoro study tool. It's primary purpose is to show the capabilities of Ahura's technology",
     "manifest_version": 2,
     "browser_action": { 
-        "default_title": "Ahura AI Data Collection.", 
+        "default_title": "Ahura AI Demo.", 
         "default_icon":  "ahura_logo.png"
      },
     "permissions": [
