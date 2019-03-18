@@ -125,9 +125,9 @@ function summary_text(msg, sender, sendResponse){
             if (response.status <= 299) {
 
                 chrome.storage.sync.set({
-                    "is_relevant" : xhr.response.is_relevant,
-                    "keywords": xhr.response.keywords,
-                    "page_id": xhr.response.page_id
+                    "is_relevant" : response.is_relevant,
+                    "keywords": response.keywords,
+                    "page_id": response.page_id
                 });
             }  
             //response.statusText //=> String
