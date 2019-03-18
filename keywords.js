@@ -6,6 +6,8 @@
  * @Since Dec 9, 2018
  */
 
+import { globals } from "./globals.js";
+
 /*
  * Clicking on a 'make relevant' link shows the list of keywords
  * each of which when clicked triggers an event to add them to the session.
@@ -70,7 +72,7 @@ export function keyword_click(event){
     let pkg = {"new_keyword": new_keyword, "is_relevant": true}
 
     let xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://13.59.94.191/pages/" + page_id + "/");
+    xhr.open("POST", `${globals.api_url}/pages/${page_id}/`);
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhr.responseType = "json";
 

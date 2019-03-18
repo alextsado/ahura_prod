@@ -8,6 +8,7 @@
 import { media } from "./mediaLib.js";
 import { show_relevant_keywords, keyword_click, keyword_cancel_click } from "./keywords.js";
 import { make_transitional } from "./transitional.js";
+import { globals } from "./globals.js";
 
 // ------------------------------------------
 // Routing
@@ -146,7 +147,7 @@ function summary_text(msg, sender, sendResponse){
             throw new Exception("There is no session ID but we called STOP on it");
         }
         pkg["session_id"] = results.session_id;
-        xhr.open("POST", "http://13.59.94.191/pages/")
+        xhr.open("POST", `${globals.api_url}/pages/`)
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.responseType = "json";
 

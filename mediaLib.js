@@ -5,6 +5,8 @@
  * @Author Barnaby B.
  * @Since Nov 28th 2018
  */
+
+import { globals } from "./globals.js";
 var MediaLib = class {
 
 
@@ -77,7 +79,7 @@ var MediaLib = class {
      */
     upload_blob(video_data){
         const timestamp = new Date().getTime();
-        const post_url = `http://13.59.94.191/video/${this._user_id}/${this._session_id}/${timestamp}/`
+        const post_url = `${globals.api_url}/video/${this._user_id}/${this._session_id}/${timestamp}/`
         const form_data = new FormData();
         form_data.append("video_file", video_data)
         fetch(post_url, {method: "post", body: form_data}).then(response => {

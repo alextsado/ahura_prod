@@ -2,14 +2,13 @@
     "name": "Ahura AI Pomodoro Demo",
     "short_name": "Ahura Demo",
     "version": "0.1.1",
-    "default_locale": "en",
     "author": "Ahura AI",
-    "homepage_url": "www.ahuraai.com",
-    "description": "This is the demo release of Ahura AI's Technology, packaged as a Pomodoro study tool. It's primary purpose is to show the capabilities of Ahura's technology",
+    "homepage_url": "https://www.ahuraai.com",
+    "description": "Demo release of Ahura AI's Tech, packaged as a Pomodoro study tool. Primarilyt to show the capabilities of Ahura's technology",
     "manifest_version": 2,
     "browser_action": { 
         "default_title": "Ahura AI Demo.", 
-        "default_icon":  "ahura_logo.png"
+        "default_icon":  "favicon.png"
      },
     "permissions": [
             "storage"

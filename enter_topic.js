@@ -17,7 +17,7 @@ let user_id = null;
  * Set up event listeners
  */
 window.onload = function(){
-    fetch("http://13.59.94.191/ping_when_plugin_opened/", {method: "get"})
+    fetch`${globals.api_url}/ping_when_plugin_opened/`, {method: "get"})
     document.querySelector("#submit_button").addEventListener("click",
         event =>  submit_button_click(event));
 
@@ -121,7 +121,7 @@ function topic_submit(msg){
                 throw new Exception("There was no user id stored in this app.");
             }
 
-            fetch("http://13.59.94.191/sessions/", {
+            fetch(`${globals.api_url}/sessions/`, {
                 body: JSON.stringify({
                     "user_id": results.user_id,
                     "time_started": msg.time_started,

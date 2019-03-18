@@ -64,7 +64,7 @@ function open_window(){
         }
     }
     if(!chat_window){
-        fetch("http://13.59.94.191/ping_when_plugin_opened/", {method: "get"})
+        fetch(`${globals.api_url}/ping_when_plugin_opened/`, {method: "get"})
         //TODO check whether there is a username. If no username then open user_name.html, otherwise enter_topic.htl
         chrome.storage.sync.get(["user_id"], results => {
             console.log("got the user_id: " + results.user_id);
@@ -125,7 +125,7 @@ function summary_text(msg, sender, sendResponse){
             throw new Exception("There is no session ID but we called STOP on it");
         }
         pkg["session_id"] = results.session_id;
-        xhr.open("POST", "http://13.59.94.191/pages/")
+        xhr.open("POST", `${globals.api_url}/pages/`)
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.responseType = "json";
 
@@ -169,7 +169,7 @@ function stop_session(msg, sender, sendResponse){
             throw new Exception("There is no session ID but we called STOP on it");
         }
         session_id = results.session_id;
-        xhr.open("POST", "http://13.59.94.191/sessions/"+ session_id + "/")
+        xhr.open("POST", `${globals.api_url}/sessions/${session_id}/`)
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.responseType = "json";
 
