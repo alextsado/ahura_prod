@@ -100,39 +100,51 @@ chrome.windows.onRemoved.addListener(window_id => {
  * Handle a summary text  message from the content page
  */
 function summary_text(msg, sender, sendResponse){
-    //TODO may have to get the session ID from sync
-    let pkg = {
-        "url": sender.url,
-        "content": msg.message,
-        "load_time": msg.load_time
-    }
-    let xhr = new XMLHttpRequest();
 
-    xhr.onreadystatechange = function(){
-        if(xhr.readyState === 4 && xhr.status <= 299){
-            //TODO maybe instead of saving this... send it to the content page itself so that the user can adjust it there?
-            chrome.storage.sync.set({
-                "is_relevant" : xhr.response.is_relevant,
-                "keywords": xhr.response.keywords,
-                "page_id": xhr.response.page_id
-            });
+    let pkg = {
+            "url": sender.url,
+            "content": msg.message,
+            "load_time": msg.load_time
         }
-        //TODO update the popup page so that it can show the user that their page was found relevant or not.
-    }
 
     chrome.storage.sync.get(["session_id", "end_time", "user_id"], results => {
         if(!results || !results.session_id){
             throw new Exception("There is no session ID but we called STOP on it");
         }
         pkg["session_id"] = results.session_id;
-        xhr.open("POST", `${globals.api_url}/pages/`)
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhr.responseType = "json";
+        
+        fetch(`${globals.api_url}/pages/`, {
+            method: "POST",
+            body: JSON.stringify(pkg),
+            headers: {
+            "Content-Type": "application/json"
+            },
+            credentials: "same-origin"
+        }).then(function(response) {
 
-        xhr.send(JSON.stringify(pkg));
+            if (response.status <= 299) {
+
+                chrome.storage.sync.set({
+                    "is_relevant" : xhr.response.is_relevant,
+                    "keywords": xhr.response.keywords,
+                    "page_id": xhr.response.page_id
+                });
+            }  
+            //response.statusText //=> String
+            //response.headers    //=> Headers
+            //response.url        //=> String
+        
+            //return response.text()
+        }, function(error) {
+            console.log(error.message); //=> String
+        })
+        
+
     });
     return true;
-} 
+
+
+}
 
 
 /**
@@ -142,6 +154,7 @@ function summary_text(msg, sender, sendResponse){
  * TODO this should also handle when a user closes the window.
  */
 function stop_session(msg, sender, sendResponse){
+
     media.stop_recording();
     globals.session_end_timer = null;
     let session_id = null;
@@ -149,19 +162,7 @@ function stop_session(msg, sender, sendResponse){
         "user_id": user_id,
         "stop_time": msg.stop_time
     }
-    let xhr = new XMLHttpRequest();
 
-    xhr.onreadystatechange = function() {
-        if(xhr.readyState === 4 && xhr.status <= 299){
-            media.stop_recording();
-            chrome.storage.sync.set({
-                "session_id": null,
-                "end_time": null
-            });
-            console.log("returning success");
-            sendResponse({"success": true});
-        }
-    }
 
     chrome.storage.sync.get(["session_id", "end_time", "user_id"], results => {
         console.log(results);
@@ -169,11 +170,34 @@ function stop_session(msg, sender, sendResponse){
             throw new Exception("There is no session ID but we called STOP on it");
         }
         session_id = results.session_id;
-        xhr.open("POST", `${globals.api_url}/sessions/${session_id}/`)
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhr.responseType = "json";
 
-        xhr.send(JSON.stringify(pkg));
+
+        fetch(`${globals.api_url}/sessions/${session_id}/`, {
+            method: "POST",
+            body: JSON.stringify(pkg),
+            headers: {
+            "Content-Type": "application/json"
+            },
+            credentials: "same-origin"
+        }).then(function(response) {
+
+            if (response.status <= 299) {
+                media.stop_recording();
+                chrome.storage.sync.set({
+                    "session_id": null,
+                    "end_time": null
+                });
+                console.log("returning success");
+                sendResponse({"success": true});
+            }  
+            //response.statusText //=> String
+            //response.headers    //=> Headers
+            //response.url        //=> String
+        
+            //return response.text()
+        }, function(error) {
+            console.log(error.message); //=> String
+        })
+
     });
-    return true;
 }
