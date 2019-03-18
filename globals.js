@@ -10,6 +10,6 @@ export let globals = {
 
     // TODO Switch these before deployment to production
 
-    api_url = "https://devapi.spentaai.com",
+    api_url: "https://devapi.spentaai.com",
     //api_url = "https://api.spentaai.com",
 }

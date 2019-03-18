@@ -10,12 +10,15 @@
  * to transitional. Then make an ajax call. If it's successful then
  * change the display to show the URL in gray without buttons.
  */
+
+import { globals } from "./globals.js";
+
 export function make_transitional(event){
     const button_pressed = event.target;
     const pli = button_pressed.closest(".page_list_item")
     const page_id = pli.getAttribute("page_id")
 
-    fetch("http://13.59.94.191/pages/${page_id}/", {
+    fetch(`${globals.api_url}/pages/${page_id}/`, {
             method: "post",
             body: JSON.stringify({
                 "is_transitional": true

@@ -37,7 +37,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
  * Set up event listeners
  */
 window.onload = function(){
-    fetch("http://13.59.94.191/ping_when_plugin_opened/", {method: "get"})
+    fetch(`${globals.api_url}/ping-when-plugin-opened/`, {method: "get"})
     setup_display();
 
     document.querySelector("#user_name_submit").addEventListener("click",

@@ -15,7 +15,7 @@ import { globals } from "./globals.js";
  * Set up event listeners
  */
 window.onload = function(){
-    fetch("http://13.59.94.191/ping_when_plugin_opened/", {method: "get"})
+    fetch(`${globals.api_url}/ping-when-plugin-opened/`, {method: "get"})
     document.querySelector("#user_name_submit").addEventListener("click",
         event =>  user_name_click(event));
 }
@@ -35,7 +35,7 @@ window.onbeforeunload = null;
  */
 function set_user_name_get_user_id(user_name){
     return new Promise((resolve, reject) => {
-        fetch("http://13.59.94.191/users/", {
+        fetch(`${globals.api_url}/users/`, {
             method: 'post',
             body: JSON.stringify({
                 "user_name": user_name,

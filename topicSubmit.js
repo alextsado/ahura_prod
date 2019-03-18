@@ -89,7 +89,7 @@ function topic_submit(msg){
                 throw new Exception("There was no user id stored in this app.");
             }
 
-            fetch("http://13.59.94.191/sessions/", {
+            fetch(`${globals.api_url}/sessions/`, {
                 body: JSON.stringify({
                     "user_id": results.user_id,
                     "time_started": msg.time_started,
