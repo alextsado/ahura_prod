@@ -71,13 +71,16 @@ export function keyword_click(event){
     console.log("page_id: " + page_id);
     let pkg = {"new_keyword": new_keyword, "is_relevant": true}
 
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", `${globals.api_url}/pages/${page_id}/`);
-    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    xhr.responseType = "json";
+    fetch(`${globals.api_url}/pages/${page_id}/`, {
+        method: "POST",
+        body: JSON.stringify(pkg),
+        headers: {
+        "Content-Type": "application/json"
+        },
+        credentials: "same-origin"
+    }).then(function(response) {
 
-    xhr.onreadystatechange = function(){
-        if(xhr.readyState === 4 && xhr.status <= 299){
+        if (response.status <= 299) {
             let page_link = keyword_link.closest(".page_list_item");
             let plad = page_link.querySelector(".page_list_buttons_div");
             plad.parentNode.removeChild(plad);
@@ -85,9 +88,15 @@ export function keyword_click(event){
             page_link.classList.add("alert-success");
             let del_me = keyword_link.closest(".keyword_wrapper");
             del_me.parentNode.removeChild(del_me);
-        }//TODO should handle failure?
-    }
-    xhr.send(JSON.stringify(pkg));
+        }  
+        //response.statusText //=> String
+        //response.headers    //=> Headers
+        //response.url        //=> String
+    
+        //return response.text()
+    }, function(error) {
+        console.log(error.message); //=> String
+    })
 
     return false;
 }

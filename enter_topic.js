@@ -17,7 +17,7 @@ let user_id = null;
  * Set up event listeners
  */
 window.onload = function(){
-    fetch`${globals.api_url}/ping_when_plugin_opened/`, {method: "get"})
+    fetch`${globals.api_url}/ping-when-plugin-opened/`, {method: "get"})
     document.querySelector("#submit_button").addEventListener("click",
         event =>  submit_button_click(event));
 
