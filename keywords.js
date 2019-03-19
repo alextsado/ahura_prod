@@ -59,7 +59,6 @@ export function keyword_cancel_click(event){
 
 /*
  * TODO get the page ID from the link data, not the session id from the stored information
- * TODO use fetch instead of xhr
  *
  * Clicking on a keyword sends an ajax request to make the page legit.
  */

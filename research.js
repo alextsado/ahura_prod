@@ -28,7 +28,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if(msg.type === "summary_text"){
         summary_text(msg, sender, sendResponse);   
     }else if(msg.type === "end_session"){
-        console.log("called end_session");
         media.stop_recording();
         return {"success": true}
     }
@@ -74,7 +73,6 @@ window.onbeforeunload = function(){
  * Handle a summary text  message from the content page
  */
 function summary_text(msg, sender, sendResponse){
-    console.log(msg, sender);
     let pkg = {
         "doc_title": msg.doc_title,
         "url": sender.url,
@@ -213,9 +211,7 @@ function setup_display(){
         setInterval(function(){document.getElementById("populate_countdown_clock").innerText = get_timer();}, 1000)
 
         // set the session_end timer to end in the correct number of minutes
-        console.log("setting session_end_timer");
         let duration = end_time - new Date(); 
-        console.log(duration);
         session_end_timer = setTimeout(function(){
             chrome.runtime.sendMessage({"type": "end_session"});
             chrome.storage.sync.set({

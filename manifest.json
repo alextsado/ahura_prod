@@ -1,10 +1,10 @@
  {
-    "name": "Ahura AI Pomodoro Demo",
+    "name": "Ahura AI Study Sprint Demo",
     "short_name": "Ahura Demo",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "author": "Ahura AI",
     "homepage_url": "https://www.ahuraai.com",
-    "description": "Demo release of Ahura AI's Tech, packaged as a Pomodoro study tool. Primarilyt to show the capabilities of Ahura's technology",
+    "description": "The first iteration of Ahura AI's technology, packaged as a study sprint tool.",
     "manifest_version": 2,
     "browser_action": { 
         "default_title": "Ahura AI Demo.", 
@@ -20,5 +20,8 @@
     "content_scripts": [{
         "matches": ["*://*/*"], 
         "js": ["content.js"]
-    }]
+    }],
+    "icons":{
+        "128":"favicon.png"
+    }
   }
