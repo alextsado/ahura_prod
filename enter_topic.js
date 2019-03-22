@@ -61,7 +61,8 @@ function submit_button_click(event){
             document.location = "research.html";
         }, show_error_text);
     }else{
-        show_error_text("Please fill out both form fields");
+        document.getElementById("study_description").style.border = "2px solid red";
+        show_error_text("Please fill in all required fields.");
     }
     return false;
 }
@@ -69,7 +70,7 @@ function submit_button_click(event){
 /*
  * Display the given error, or a default text, in the pages error display
  */
-function show_error_text(error = "Unknown Error"){
+function show_error_text(error = "Please fill in all required fields"){
     document.querySelector("#error_content").innerText = error;
     document.querySelector("#error_content").style.display = "contents";
 }
@@ -140,16 +141,26 @@ function topic_submit(msg){
                     throw new Exception(response.statusText);
                 }
             }).then(response => {
+                //TODO what if the back-end didn't recognize any keywords?
 
-                let end_time = msg.time_started + msg.duration* 60000;
-                chrome.storage.sync.set({
-                    "session_id": response.session_id,
-                    "end_time": end_time,
-                    "description": msg.description,
-                    "keywords": response.keywords}, result => {
-                        console.log("saved session to disk " + new Date().getTime());
-                        resolve(response.session_id);
-                });
+                console.log(response);
+                debugger;
+                if(!response.keywords || response.keywords.length <= 1){
+                    document.getElementById("study_description").style.border = "2px solid red";
+                    show_error_text("We didn't find any keywords in your subject. Please rephrase");
+                    let rem_me = document.getElementById("topic_submission_spinner");
+                    rem_me.parentElement.removeChild(rem_me);
+                }else{
+                    let end_time = msg.time_started + msg.duration* 60000;
+                    chrome.storage.sync.set({
+                        "session_id": response.session_id,
+                        "end_time": end_time,
+                        "description": msg.description,
+                        "keywords": response.keywords}, result => {
+                            console.log("saved session to disk " + new Date().getTime());
+                            resolve(response.session_id);
+                    });
+                }
             }).catch(error => alert(error));
         });
     });

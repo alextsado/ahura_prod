@@ -25,11 +25,6 @@
 
         <div id="enter_query_container">
             <div class="container" >
-                <div id="error_content" class="alert alert-danger"
-                                        style="width: 400; display: none; color: red; font-weight: bold">
-                    &nbsp;
-                </div>
-
                 <div class="row">
                     <div class="col-3">
                         &nbsp;
@@ -50,8 +45,11 @@
                         </div>
 
                         <div class="row">
-                            <textarea name="description" class="form-control enter_shadow" style="text-align: center;"
-                                                         placeholder="Type subject here." ></textarea>
+                            <textarea name="description"
+                                      id="study_description" class="form-control enter_shadow"
+                                      style="text-align: center;"
+                                      placeholder="Type subject here." >
+                            </textarea>
                         </div>
                         <div class="row" style="margin-top: 35px;">
                             <div class="col-7">
@@ -68,6 +66,17 @@
                                 </select>
                             </div>
                         </div>
+
+
+                        <div class="row justify-content-md-center">
+                            <div id="error_content" style="width: 400; display: none; color: red;">
+                                <img src="error_icon.png" height=15 />
+                                Please fill in all required fields.
+                            </div>
+                        </div>
+
+
+
                         <div class="row justify-content-md-center">
                             <div class="col-4">
                                 <button id="submit_button" type="submit" class="btn btn-primary" value="submit">
