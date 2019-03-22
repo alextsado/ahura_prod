@@ -1,6 +1,12 @@
+body {
+    font-family: "Roboto";
+    background-image: url("tooth_tile_2.jpg");
+    background-repeat: repeat;
+}
 h3 {
     color: #119ca1;
-    font-size: 1.1rem;
+    font-size: 2.5rem;
+    font-family: "Bree Serif";
 }
 #inputVideo {
     height: 250px;
@@ -22,6 +28,7 @@ h3 {
     margin-top: -20px;
     position: relative;
     background-color: #ffeeba;
+    border-color: #ffeeba;
     float: right;
     margin-right: 75px;
     font-size: 10px;
@@ -30,6 +37,7 @@ h3 {
     margin-top: -20px;
     position: relative;
     background-color: #ffeeba;
+    border-color: #ffeeba;
     float: right;
     margin-right: 0px;
     font-size: 10px;
@@ -47,17 +55,21 @@ h3 {
 }
 .enter_shadow {
     box-shadow: 0px 0px 29px #888;
+    border-radius: 35px;
+    margin: 20px 0px 10px 0px;
 }
 #collection_content {
     text-align: center;
 }
 #enter_query_container {
+    padding-top: 45px;
     width: 100%;
     height: 100%;
-    background-image: linear-gradient(to bottom right, white, #c9c6ec);
+    background-image: linear-gradient(to bottom left, rgba(255,255,255,0), rgba(255,255,255,1));
 }
 #stop_session, #submit_button, #user_name_submit {
-    background-image: linear-gradient(to bottom right, #33b38e, #0393aa);
+    background: #33b38e;
+    border-color: #33b38e;
     margin-top: 35px;
     width: 100%;
     color: white;

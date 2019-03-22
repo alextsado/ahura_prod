@@ -11,6 +11,18 @@
         <script type="module" src="enter_topic.js"></script> <!--TODO change this to enter_topic.js and trim it down -->
     </head>
     <body> 
+
+        <div style="box-shadow: 0px 8px 35px #888; background-color: #33b38e;">
+            <div class="container">
+                <div class="row"  style="text-align: center;">
+                    <div class="col">
+                        <img src="logo_white.png" style="height: 45px; margin-top: 15px; margin-bottom: 15px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div id="enter_query_container">
             <div class="container" >
                 <div id="error_content" class="alert alert-danger"
@@ -24,56 +36,46 @@
                     </div>
 
                     <div class="form-group col-6" id="collection_content">
-                        <div class="row">
-                            <div class="col">
-                                <img src="ahura_logo.png" style="height: 100px; margin-top: 35px;" />
-                            </div>
-                        </div>
                         <div id="greeting" class="row">
                             <div class="col">
                                 <h3>
-                                    Welcome <span id="user_name_greeting"> &nbsp; </span>.
+                                    Welcome <span id="user_name_greeting"> &nbsp; </span>!
                                 </h3>
                             </div>
                         </div>
                         <div class="row">
                             <label class="col" for="description">
-                                Type in a brief description of your study in the field below
+                                We help you stay focused by keeping you on relevant subjects during your study session.
                             </label>
                         </div>
 
                         <div class="row">
-                            <textarea name="description" class="form-control enter_shadow"
-                                                         placeholder="Example: 'Origins of the electoral college.'" ></textarea>
+                            <textarea name="description" class="form-control enter_shadow" style="text-align: center;"
+                                                         placeholder="Type subject here." ></textarea>
                         </div>
                         <div class="row" style="margin-top: 35px;">
-                            <div class="col">
+                            <div class="col-7">
                                 <label for="duration">
-                                    From the dropdown below select how many minutes you want to spend studying.
+                                    Select length of study session
                                     <label>
                             </div>
-                        </div>
-                        <div class="row justify-content-md-center">
-                            <div class="col-8">
-                                <select class="form-control enter_shadow" id="duration" name="duration">
+                            <div class="col-5">
+                                <select class="form-control enter_shadow" id="duration" name="duration" style="margin-top: -5px;">
                                     <option value="5">5 Minutes</option>
-                                    <option value="10">10 Minutes</option>
+                                    <option selected value="10">10 Minutes</option>
                                     <option value="15">15 Minutes</option>
-                                    <option selected value="20">20 Minutes</option>
+                                    <option value="20">20 Minutes</option>
                                 </select>
                             </div>
                         </div>
                         <div class="row justify-content-md-center">
                             <div class="col-4">
                                 <button id="submit_button" type="submit" class="btn btn-primary" value="submit">
-                                    Start
+                                    Next
                                 </button>
                             </div>
                         </div>
 
-                    </div>
-                    <div id="enter_image_content" class="col-3">
-                        <img src="login_asset.png" id="login_asset">
                     </div>
                 </div>
             </div>

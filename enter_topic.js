@@ -26,7 +26,8 @@ window.onload = function(){
         user_name = result.user_name;
         user_id = result.user_id;
         document.querySelector("#user_name_greeting").innerText = result.user_name;
-    })
+        console.log("about to create spinner");
+    });
 }
 
 /*
@@ -94,17 +95,16 @@ function set_session_id_remove_spinner(session_id){
  * Put a spinner on top of the submission form
  */
 function create_topic_submission_spinner(){
-    console.log("creating the topic submission_spinner");
     let topic_submission_form = document.getElementById("collection_content");
-    let my_rect = topic_submission_form.getBoundingClientRect();
+    //let my_rect = topic_submission_form.getBoundingClientRect();
     let spinner = document.createElement("img");
     spinner.setAttribute("src", "spinner.gif");
     spinner.setAttribute("id", "topic_submission_spinner");
     spinner.style.position = "absolute";
-    spinner.style.top = my_rect.x;
-    spinner.style.left = my_rect.y;
+    spinner.style.top = "100px";// my_rect.x;
+    spinner.style.left = "190px";//my_rect.y;
     spinner.style.width = "150px";
-    document.querySelector("body").append(spinner);
+    document.querySelector("#collection_content").append(spinner);
 }
 
 

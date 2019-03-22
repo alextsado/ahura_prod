@@ -8,7 +8,6 @@
  * @Since Nov 9, 2018
  */
 
-import { media } from "./mediaLib.js";
 import { globals } from "./globals.js";
 
 /*
@@ -50,7 +49,6 @@ function set_user_name_get_user_id(user_name){
             }
         }).then( response => {
             console.log("response is ", response);
-            media.user_id = response.user_id;
             chrome.storage.sync.set({
                 "user_name": user_name,
                 "user_id": response.user_id
@@ -67,11 +65,14 @@ function set_user_name_get_user_id(user_name){
  * TODO should this be a form submission capture rather than a button click?
  */
 export function user_name_click(){
+    create_topic_submission_spinner();
     let user_name = document.querySelector("#user_name_input").value;
     if(user_name.length <= 1){ //ask again
         console.log("No username");
         document.querySelector("#user_name_input").focus();
-        document.querySelector("#user_name_submit").append("Please fill in a name and resubmit.");
+        document.querySelector("#user_name_input").style.border = "2px solid red";
+        document.querySelector("#error_content").style.display = "block";
+        //document.querySelector("#user_name_submit").append("Please fill in a name and resubmit.");
     }else{ //username is good
         console.log("username is ", user_name);
         set_user_name_get_user_id(user_name).then( user_id => {
@@ -82,3 +83,23 @@ export function user_name_click(){
         });
     }
 }
+
+
+
+
+/*
+ * Put a spinner on top of the submission form
+ */
+function create_topic_submission_spinner(){
+    let topic_submission_form = document.getElementById("collection_content");
+    //let my_rect = topic_submission_form.getBoundingClientRect();
+    let spinner = document.createElement("img");
+    spinner.setAttribute("src", "spinner.gif");
+    spinner.setAttribute("id", "topic_submission_spinner");
+    spinner.style.position = "absolute";
+    spinner.style.top = "100px";// my_rect.x;
+    spinner.style.left = "190px";//my_rect.y;
+    spinner.style.width = "150px";
+    document.querySelector("#collection_content").append(spinner);
+}
+
