@@ -147,7 +147,7 @@ function topic_submit(msg){
                 debugger;
                 if(!response.keywords || response.keywords.length <= 1){
                     document.getElementById("study_description").style.border = "2px solid red";
-                    show_error_text("We didn't find any keywords in your subject. Please rephrase");
+                    show_error_text("We didn't find any keywords in your subject. Please rephrase your entry.");
                     let rem_me = document.getElementById("topic_submission_spinner");
                     rem_me.parentElement.removeChild(rem_me);
                 }else{
