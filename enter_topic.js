@@ -26,7 +26,6 @@ window.onload = function(){
         user_name = result.user_name;
         user_id = result.user_id;
         document.querySelector("#user_name_greeting").innerText = result.user_name;
-        console.log("about to create spinner");
     });
 }
 
@@ -114,8 +113,6 @@ function create_topic_submission_spinner(){
  * Handle a topic submission from the popup page.
  */
 function topic_submit(msg){
-    console.log("msg is");
-    console.log(msg);
     return new Promise((resolve, reject) => {
         chrome.storage.sync.get("user_id", results => {
             if(!results || !results.user_id || results.user_id.length <= 0){
@@ -143,8 +140,6 @@ function topic_submit(msg){
             }).then(response => {
                 //TODO what if the back-end didn't recognize any keywords?
 
-                console.log(response);
-                debugger;
                 if(!response.keywords || response.keywords.length <= 1){
                     document.getElementById("study_description").style.border = "2px solid red";
                     show_error_text("We didn't find any keywords in your subject. Please rephrase your entry.");
@@ -157,7 +152,6 @@ function topic_submit(msg){
                         "end_time": end_time,
                         "description": msg.description,
                         "keywords": response.keywords}, result => {
-                            console.log("saved session to disk " + new Date().getTime());
                             resolve(response.session_id);
                     });
                 }

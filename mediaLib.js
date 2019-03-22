@@ -14,17 +14,13 @@ var MediaLib = class {
     * Upload the webcamera stream every 6 seconds.
     */
     constructor(){
-        console.log("media lib constructor");
 
         this._session_id = "no_session";
         this._user_id = "no_user";
 
         navigator.mediaDevices.getUserMedia({audio: true, video: true}).then(stream=>{
-            console.log("asdf");
           this.media_recorder = new MediaRecorder(stream);
-            console.log("zxcv");
           this.media_recorder.ondataavailable = e => {
-              console.log("about to upload");
               this.upload_blob(e.data);
           }
             this.media_recorder.start(6000);
@@ -46,7 +42,6 @@ var MediaLib = class {
      * If the media_recorder is set up then start recording in 6 second intervals
      */
     start_recording(){
-        console.log("starting recording");
         if(!this._user_id){
             alert("No user id");
         }
@@ -61,15 +56,10 @@ var MediaLib = class {
      * If the recorder is set up then stop recording
      */
     stop_recording(){
-        console.log("Called stop recording");
         if(!!this.media_recorder){
-            console.log("has a media recroder");
             try{
-                console.log("about to stop media");
                 this.media_recorder.stop();
-                console.log("stopped media");
             }catch(e){
-                console.log("media stop FAILED");
                 this.media_recorder = null;
             }
         }else{
@@ -82,7 +72,6 @@ var MediaLib = class {
      * POST the video clip
      */
     upload_blob(video_data){
-        console.log("about to upload blob");
         const timestamp = new Date().getTime();
         const post_url = `${globals.api_url}/video/${this._user_id}/${this._session_id}/${timestamp}/`
         const form_data = new FormData();

@@ -188,11 +188,25 @@ function setup_display(){
     var inputVideo = $("#inputVideo");
     inputVideo.on("play", onPlay);
 
-    chrome.storage.sync.get(["session_id", "end_time", "user_name", "user_id", "description"], result => {
+    chrome.storage.sync.get(["session_id", "end_time", "user_name", "user_id", "description", "keywords"], result => {
         //Check that everything is OK
         if(!result || !result.session_id || !result.user_name || new Date() > new Date(result.end_time)){
            console.error("THERE WAS SOMETHING WRONG WITH SAVING THE SESSION"); 
         }
+
+        
+        let keywords_list = result.keywords.split("~");
+        let keywords_tags = `
+                ${keywords_list.map( keyword => ` 
+                    <div class="col-4 keyword_list_item">
+                        ${keyword}
+                    </div>
+                `).join('')}
+        `
+
+
+        document.getElementById("populate_keywords").innerHTML = keywords_tags;
+
         document.getElementById("populate_description").innerText = result.description;
         
         // calculate how much time is left in the session
