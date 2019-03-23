@@ -85,57 +85,49 @@ function summary_text(msg, sender, sendResponse){
 
     xhr.onreadystatechange = function(){
         if(xhr.readyState === 4 && xhr.status <= 299){
-            chrome.storage.sync.set({
-                "is_relevant" : xhr.response.is_relevant,
-                "keywords": xhr.response.keywords,
-                "page_id": xhr.response.page_id
-            });
+            const time_loaded = new Date().getTime();
+
+            let add_pages_visited = document.querySelector("#add_pages_visited");
+            if(!!add_pages_visited.firstElementChild){
+                let time_div = add_pages_visited.firstElementChild.getElementsByClassName("populate_time_spent")[0];
+                let previous_time = time_div.getAttribute("time_loaded");
+                let time_delta = (time_loaded - Number(previous_time))/1000;
+                let time_delta_mins = Math.floor(time_delta/60);
+                let time_delta_secs = Math.floor(time_delta%60);
+                if(time_delta_secs < 10){
+                    time_delta_secs = "0" + time_delta_secs;
+                }
+                let display_time = `${time_delta_mins}:${time_delta_secs}`;
+                time_div.innerText = display_time;
+            }
+
 
             const page_id = xhr.response.page_id;
-            let page_visited_template = "";
-            if(xhr.response.is_transitional){
-                page_visited_template = `
-                    <div class="alert alert-dark row page_list_item" page_id="${page_id}"> 
-                        <div class="row history_title">
+
+            let yes_class = (!xhr.response.is_transitional & xhr.response.is_relevant ? 'btn-success' : 'btn-light'
+            let no_class = (!xhr.response.is_transitional & !xhr.response.is_relevant) ? 'btn-danger' : 'btn-light';
+            let transit_class = xhr.response.is_transitional ? 'btn-secondary' : 'btn-light';
+            let page_visited_template = `
+                    <div class="row page_list_item" page_id="${page_id}">
+                        <div class="col-2 populate_time_spent" time_loaded="${time_loaded}">
+                            . . .
+                        </div>
+                        <div class="col-7 row">
                             ${msg.doc_title}
                         </div>
-                        <div class="row history_url">
-                            ${sender.url}
-                        </div>
+                        <button class="span-1 btn ${yes_class}">
+                            Yes
+                        </button>
+                        <button class="span-1 btn ${no_class} ">
+                            No
+                        </button>
+                        <button class="span-1 btn ${transit_class}">
+                            Transit
+                        </button>
                     </div>
                 `
-            }else if(xhr.response.is_relevant){
-                page_visited_template = `
-                    <div class="alert alert-success row page_list_item" page_id="${page_id}">
-                        <div class="row history_title">
-                            ${msg.doc_title}
-                        </div>
-                        <div class="row history_url">
-                            ${sender.url}
-                        </div>
-                    </div>                `
-            }else{
-                let keyword_string = xhr.response.keywords;
-                let rand_id = "make_relevant_" + Math.round(Math.random()*100000);
-                page_visited_template = `
-                    <div class="alert alert-warning row page_list_item row" page_id="${page_id}">
-                        <div class="row history_title">
-                            ${msg.doc_title}
-                        </div>
-                        <div class="row history_url">
-                            ${sender.url}
-                        </div>
-                    <div style="width: 100%" class="page_list_buttons_div">
-                        <a href="#" class="make_transitional_button">
-                            Ignore
-                        </a>
-                        <a href="#" class="make_relevant_button" id="${rand_id}" noun_keywords="${keyword_string}">
-                            Make Relevant
-                        </a>
-                    </div>
-                `
-            }
-            document.querySelector("#add_pages_visited").insertAdjacentHTML(
+            
+            add_pages_visited.insertAdjacentHTML(
                 "afterbegin", page_visited_template); //afterbegin prepends it, beforeend appends
         }
     }
