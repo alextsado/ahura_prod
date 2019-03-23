@@ -6,16 +6,37 @@
  * @Since Nov 12, 2018
  */
 let load_time = new Date();
+
 /* Don't do anything unless the user specifically said they're in 
  * a pomodoro study session right now 
  */
-chrome.storage.sync.get(["end_time", "session_id"], results => {
-    if(!!results && !!results.session_id && !!results.end_time){
-        if(new Date() < new Date(results.end_time)){
-            ahura_go(results);
+function scan_page(){
+    chrome.storage.sync.get(["end_time", "session_id"], results => {
+        if(!!results && !!results.session_id && !!results.end_time){
+            if(new Date() < new Date(results.end_time)){
+                ahura_go(results);
+            }
         }
+    });
+}
+
+
+/**
+ * When a user switches tabs let's re-scan the page and redisplay it in their history
+ */
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    console.log("message received");
+    if(msg.type === "rescan"){
+        console.log("rescanning");
+        scan_page();
     }
 });
+
+
+
+
+// When the page first loads scan it
+scan_page();
 
 /*
  * Collect the first couple hundred characters of text to be

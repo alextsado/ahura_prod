@@ -42,6 +42,13 @@ chrome.storage.sync.get(['user_id', 'user_name'], result => {
     }
 });
 
+chrome.tabs.onActivated.addListener(activateInfo => {
+    console.log("switched tab");
+    console.log(activateInfo);
+    chrome.tabs.sendMessage(activateInfo.tabId, {
+        type: "rescan"
+    });
+});
 
 /**
  * When a user clicks the icon then open a new window
