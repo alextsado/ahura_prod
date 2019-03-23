@@ -19,6 +19,8 @@ let description;
 let end_time;
 let user_id;
 let session_end_timer;
+let distraction_counter = 0;
+let distraction_threshold = 3;
 
 /*
  * Route any messages relevant to the functionality of the window
@@ -65,6 +67,45 @@ window.onbeforeunload = function(){
     return "Closing this window will end your study session";
 }
 
+
+/**
+ * If a page is relevant subtract from the counter. If it's a distraction then add to the counter.
+ * It can't go below zero, nor above the threshold.
+ * Once it hits the threshold then foreground the window
+ */
+function adjust_distraction_counter(is_relevant){
+    if(is_relevant && distraction_counter > 0){
+        distraction_counter--;
+    }else if(!is_relevant && distraction_counter < distraction_threshold){
+        distraction_counter++;
+        if(distraction_counter >= distraction_threshold){
+            console.log("about to foreground");
+            chrome.runtime.sendMessage({
+                "type": "open_window"
+            });
+            show_distracted_overlay();
+        }
+    }
+}
+
+/**
+ * Show an overlay to tell the user that we think they're distracted.
+ */
+function show_distracted_overlay(){
+    document.getElementById("overlay_bg").style.display = "block";
+    document.getElementById("distracted_overlay_content").style.display = "block";
+}
+
+/**
+ * Hide the overlay that was telling the user that we think they're distracted.
+ */
+function hide_distracted_overlay(){
+    document.getElementById("overlay_bg").style.display = "none";
+    document.getElementById("distracted_overlay_content").style.display = "none";
+}
+
+
+
 // ----------------------------------
 // message Listeners
 // -------------------------------------------------
@@ -84,8 +125,11 @@ function summary_text(msg, sender, sendResponse){
     let xhr = new XMLHttpRequest();
 
     xhr.onreadystatechange = function(){
-        if(xhr.readyState === 4 && xhr.status <= 299){
+        if(xhr.readyState === 4 && xhr.status <= 299 && !!xhr.response){
             const time_loaded = new Date().getTime();
+
+            console.log(xhr.response);
+            adjust_distraction_counter(xhr.response.is_relevant);
 
             let add_pages_visited = document.querySelector("#add_pages_visited");
             if(!!add_pages_visited.firstElementChild){
@@ -104,7 +148,7 @@ function summary_text(msg, sender, sendResponse){
 
             const page_id = xhr.response.page_id;
 
-            let yes_class = (!xhr.response.is_transitional & xhr.response.is_relevant ? 'btn-success' : 'btn-light'
+            let yes_class = (!xhr.response.is_transitional & xhr.response.is_relevant) ? 'btn-success' : 'btn-light';
             let no_class = (!xhr.response.is_transitional & !xhr.response.is_relevant) ? 'btn-danger' : 'btn-light';
             let transit_class = xhr.response.is_transitional ? 'btn-secondary' : 'btn-light';
             let page_visited_template = `

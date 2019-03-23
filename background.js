@@ -20,6 +20,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if(msg.type === "stop_session"){
         return stop_session(msg, sender, sendResponse);
     }
+    if(msg.type="open_window"){
+        console.log("about to foreground");
+        open_window();
+    }
     return true;
 });
 
@@ -37,14 +41,11 @@ chrome.storage.sync.get(['user_id', 'user_name'], result => {
         user_id = result.user_id;
         user_name = result.user_name;
     }else{
-        console.log("results lacked either a user id or a user name: ", result);
         open_window();
     }
 });
 
 chrome.tabs.onActivated.addListener(activateInfo => {
-    console.log("switched tab");
-    console.log(activateInfo);
     chrome.tabs.sendMessage(activateInfo.tabId, {
         type: "rescan"
     });
@@ -74,7 +75,6 @@ function open_window(){
         fetch(`${globals.api_url}/ping-when-plugin-opened/`, {method: "get"})
         //TODO check whether there is a username. If no username then open user_name.html, otherwise enter_topic.htl
         chrome.storage.sync.get(["user_id"], results => {
-            console.log("got the user_id: " + results.user_id);
             let open_url;// = "research.html";
             if(!!results && !!results.user_id){
                 open_url = "enter_topic.html";
@@ -97,7 +97,6 @@ function open_window(){
 
 chrome.windows.onRemoved.addListener(window_id => {
     if(!!chat_window && window_id === chat_window.id){
-        console.log("THEY CLOSED THE WINDOW!!!");
         chat_window = null;
     }
 });
@@ -172,7 +171,6 @@ function stop_session(msg, sender, sendResponse){
 
 
     chrome.storage.sync.get(["session_id", "end_time", "user_id"], results => {
-        console.log(results);
         if(!results || !results.session_id){
             throw new Exception("There is no session ID but we called STOP on it");
         }
@@ -194,7 +192,6 @@ function stop_session(msg, sender, sendResponse){
                     "session_id": null,
                     "end_time": null
                 });
-                console.log("returning success");
                 sendResponse({"success": true});
             }  
             //response.statusText //=> String

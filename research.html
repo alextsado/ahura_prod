@@ -18,6 +18,29 @@
         <script type="module" src="research.js"></script>
     </head>
     <body> 
+
+
+        <!-- overlays -->
+        <div id="overlay_bg"> 
+            <div class="container">
+                &nbsp;
+                <div class="row" id="distracted_overlay_content">
+                    <div class="col-12">
+                        You seem to be distracted!
+                    </div>
+                </div>
+                <div class="row" id="relevant_overlay_content">
+                    <div class="col-12">
+                        Help make the selected icon relevant
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Green bar at the top -->
+
+
         <div style="box-shadow: 0px 8px 35px #888; background-color: #33b38e;">
             <div class="container">
                 <div class="row">
@@ -36,6 +59,7 @@
             </div>
         </div>
 
+        <!-- The main content of the page -->
 
         <div id="research_container">
             <div class="container">
@@ -97,6 +121,10 @@
                             &nbsp;
                         </div>
                     </div>
+
+
+                    <!-- Video of the user (for the demo) -->
+
                     <div class="col-4" style="background: white;">
                         <div id="tf_canvas" class="row">
                             <video id="inputVideo" autoplay muted></video>
@@ -112,9 +140,7 @@
                                 <img src="login_asset.png" id="session_asset">
                             </div>
                         </div>
-
                     </div>
-
                 </div>
             </div>
         </div>

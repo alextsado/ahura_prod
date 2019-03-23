@@ -98,3 +98,22 @@ h3 {
     box-shadow: 0px 0px 1px;
     border-radius: 5px;
 }
+#overlay_bg {
+    height: 100%;
+    width: 100%;
+    display: none;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 2;
+}   
+#relevant_overlay_content    {
+    margin-top: 45px;
+    display: none;
+}
+#distracted_overlay_content    {
+    margin-top: 45px;
+    display: none;
+}
