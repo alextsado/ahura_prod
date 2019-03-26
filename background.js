@@ -8,7 +8,7 @@
 
 "use strict";
 import { globals } from "./globals.js";
-import { media } from "./mediaLib.js";
+//import { media } from "./mediaLib.js";
 //TODO don't import media or make it so that importing it doesn't turn on the camera
 
 /*
@@ -20,8 +20,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if(msg.type === "stop_session"){
         return stop_session(msg, sender, sendResponse);
     }
-    if(msg.type="open_window"){
-        console.log("about to foreground");
+    if(msg.type === "open_window"){
+        console.log("received command: about to foreground");
         open_window();
     }
     return true;
@@ -161,7 +161,7 @@ function summary_text(msg, sender, sendResponse){
  */
 function stop_session(msg, sender, sendResponse){
 
-    media.stop_recording();
+    //media.stop_recording();
     globals.session_end_timer = null;
     let session_id = null;
     let pkg = {
@@ -187,7 +187,7 @@ function stop_session(msg, sender, sendResponse){
         }).then(function(response) {
 
             if (response.status <= 299) {
-                media.stop_recording();
+                //media.stop_recording();
                 chrome.storage.sync.set({
                     "session_id": null,
                     "end_time": null

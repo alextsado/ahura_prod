@@ -11,14 +11,15 @@
         "default_icon":  "favicon.png"
      },
     "permissions": [
-            "storage"
+            "storage",
+            "activeTab"
     ],
     "background": {
         "page": "background.html",
         "persistent": false
     },
     "content_scripts": [{
-        "matches": ["*://*/*"], 
+        "matches": ["http://*/*", "https://*/*"], 
         "js": ["content.js"]
     }],
     "icons":{

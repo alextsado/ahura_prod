@@ -5,7 +5,7 @@
  * @Since Nov 14, 2018
  */
 "use strict";
-import { media } from "./mediaLib.js";
+//import { media } from "./mediaLib.js";
 import { show_relevant_keywords, keyword_click, keyword_cancel_click } from "./keywords.js";
 import { make_transitional } from "./transitional.js";
 import { globals } from "./globals.js";
@@ -41,6 +41,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 window.onload = function(){
     setup_display();
 
+    document.getElementById("close_distraction_overlay_button").addEventListener("click",
+        event => get_back_to_studying(event));
+
     document.querySelector("#stop_session").addEventListener("click",
         event =>  stop_session_click(event));
 
@@ -74,12 +77,14 @@ window.onbeforeunload = function(){
  * Once it hits the threshold then foreground the window
  */
 function adjust_distraction_counter(is_relevant){
+    console.log("adjust_distraction got called at " + new Date());
+    //TODO check that there is an ongoing session first
     if(is_relevant && distraction_counter > 0){
         distraction_counter--;
     }else if(!is_relevant && distraction_counter < distraction_threshold){
         distraction_counter++;
         if(distraction_counter >= distraction_threshold){
-            console.log("about to foreground");
+            console.log("front-end: about to foreground");
             chrome.runtime.sendMessage({
                 "type": "open_window"
             });
@@ -104,7 +109,21 @@ function hide_distracted_overlay(){
     document.getElementById("distracted_overlay_content").style.display = "none";
 }
 
-
+/**
+ * Close the overlay, subtract a point from the distraction counter.
+ * Open a new tab that has a search for relevant topics.
+ */
+function get_back_to_studying(event){
+    console.log("closing the overlay and taking away one distraction point");
+    hide_distracted_overlay();
+    distraction_counter--;
+    chrome.storage.sync.get("keywords", results => {
+        let keywords_list = results.keywords.split("~");
+        let relevant_topic = keywords_list[0];
+        let win = window.open(`https://google.com/search?q=${relevant_topic}`, '_blank');
+        win.focus();
+    });
+}
 
 // ----------------------------------
 // message Listeners
@@ -126,10 +145,13 @@ function summary_text(msg, sender, sendResponse){
 
     xhr.onreadystatechange = function(){
         if(xhr.readyState === 4 && xhr.status <= 299 && !!xhr.response){
+            console.log("xhr ready state was 200 with a response at " + new Date());
             const time_loaded = new Date().getTime();
 
             console.log(xhr.response);
-            adjust_distraction_counter(xhr.response.is_relevant);
+            if(!xhr.is_transitional){
+                adjust_distraction_counter(xhr.response.is_relevant);
+            }
 
             let add_pages_visited = document.querySelector("#add_pages_visited");
             if(!!add_pages_visited.firstElementChild){
@@ -221,8 +243,8 @@ function stop_session_click(){
  *
  */
 function setup_display(){
-    var inputVideo = $("#inputVideo");
-    inputVideo.on("play", onPlay);
+    var inputVideo = document.getElementById("inputVideo");
+    inputVideo.addEventListener("play", onPlay);
 
     chrome.storage.sync.get(["session_id", "end_time", "user_name", "user_id", "description", "keywords"], result => {
         //Check that everything is OK

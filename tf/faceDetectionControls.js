@@ -27,13 +27,13 @@ function getFaceDetectorOptions() {
 
 function onIncreaseMinConfidence() {
   minConfidence = Math.min(faceapi.round(minConfidence + 0.1), 1.0)
-  $('#minConfidence').val(minConfidence)
+  document.getElementById('minConfidence').value = minConfidence;
   updateResults()
 }
 
 function onDecreaseMinConfidence() {
   minConfidence = Math.max(faceapi.round(minConfidence - 0.1), 0.1)
-  $('#minConfidence').val(minConfidence)
+  document.getElementById('minConfidence').value = minConfidence;
   updateResults()
 }
 
@@ -44,32 +44,28 @@ function onInputSizeChanged(e) {
 
 function changeInputSize(size) {
   inputSize = parseInt(size)
-
-  const inputSizeSelect = $('#inputSize')
-  inputSizeSelect.val(inputSize)
-  //inputSizeSelect.material_select()
 }
 
 function onIncreaseScoreThreshold() {
   scoreThreshold = Math.min(faceapi.round(scoreThreshold + 0.1), 1.0)
-  $('#scoreThreshold').val(scoreThreshold)
+  document.getElementById('scoreThreshold').value = scoreThreshold;
   updateResults()
 }
 
 function onDecreaseScoreThreshold() {
   scoreThreshold = Math.max(faceapi.round(scoreThreshold - 0.1), 0.1)
-  $('#scoreThreshold').val(scoreThreshold)
+  document.getElementById('scoreThreshold').value = scoreThreshold;
   updateResults()
 }
 
 function onIncreaseMinFaceSize() {
   minFaceSize = Math.min(faceapi.round(minFaceSize + 20), 300)
-  $('#minFaceSize').val(minFaceSize)
+  document.getElementById('minFaceSize').value = minFaceSize;
 }
 
 function onDecreaseMinFaceSize() {
   minFaceSize = Math.max(faceapi.round(minFaceSize - 20), 50)
-  $('#minFaceSize').val(minFaceSize)
+  document.getElementById('minFaceSize').value = minFaceSize;
 }
 
 function getCurrentFaceDetectionNet() {
@@ -89,38 +85,14 @@ function isFaceDetectionModelLoaded() {
 }
 
 async function changeFaceDetector(detector) {
-  ['#ssd_mobilenetv1_controls', '#tiny_face_detector_controls', '#mtcnn_controls']
-    .forEach(id => $(id).hide())
+  //['#ssd_mobilenetv1_controls', '#tiny_face_detector_controls', '#mtcnn_controls'].forEach(id => document.getElementById(id).style.display = 'none');
 
   selectedFaceDetector = detector
-  const faceDetectorSelect = $('#selectFaceDetector')
-  faceDetectorSelect.val(detector)
-  //faceDetectorSelect.material_select()
+  //const faceDetectorSelect = document.getElementById('selectFaceDetector')
+  //faceDetectorSelect.value = detector;
 
-  $('#loader').show()
-  if (!isFaceDetectionModelLoaded()) {
+  //document.getElementById('#loader').style.display = "content";
+  if (!isFaceDetectionModelLoaded()){
     await getCurrentFaceDetectionNet().load('/')
   }
-
-  $(`#${detector}_controls`).show()
-  $('#loader').hide()
-}
-
-async function onSelectedFaceDetectorChanged(e) {
-  selectedFaceDetector = e.target.value
-
-  await changeFaceDetector(e.target.value)
-  updateResults()
-}
-
-function initFaceDetectionControls() {
-  const faceDetectorSelect = $('#selectFaceDetector')
-  faceDetectorSelect.val(selectedFaceDetector)
-  faceDetectorSelect.on('change', onSelectedFaceDetectorChanged)
-  //faceDetectorSelect.material_select()
-
-  const inputSizeSelect = $('#inputSize')
-  inputSizeSelect.val(inputSize)
-  inputSizeSelect.on('change', onInputSizeChanged)
-  //inputSizeSelect.material_select()
 }

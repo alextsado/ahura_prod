@@ -10,7 +10,6 @@
         <link rel="stylesheet" href="ahura.css">
         <link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-        <script src="tf/jquery-2.1.1.min.js"></script>
         <script src="tf/face-api.js"></script>
         <script src="tf/drawing.js"></script>
         <script src="tf/faceDetectionControls.js"></script>
@@ -19,17 +18,46 @@
     </head>
     <body> 
 
-
         <!-- overlays -->
         <div id="overlay_bg"> 
-            <div class="container">
+            <div class="container" id="distracted_overlay_content">
                 &nbsp;
-                <div class="row" id="distracted_overlay_content">
-                    <div class="col-12">
-                        You seem to be distracted!
+                <div class="row justify-content-center">
+                    <div class="col-2 text-center">
+                        <img src="exclamation_icon.png" height=50 />
                     </div>
                 </div>
-                <div class="row" id="relevant_overlay_content">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <h3 style="color: red;">
+                            Focus is paramount to success.
+                        </h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 text-center">
+                        Our AI has detected that you are distracted. If this is in error please add this page to your study topic. 
+                        Otherwise now is a good time to get back to studying.
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-2">
+                        <button class="btn btn-primary btn-block" id="close_distraction_overlay_button">
+                            Back to Studying
+                        </button>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-5">
+                        <a href="#" id="make_relevant_overlay_link">
+                            Add this page to your study topic.
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container" id="relevant_overlay_content">
+                <div class="row">
                     <div class="col-12">
                         Help make the selected icon relevant
                     </div>

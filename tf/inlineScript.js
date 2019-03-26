@@ -4,15 +4,10 @@
 let forwardTimes = []
 let withBoxes = true
 
-function onChangeHideBoundingBoxes(e) {
-  withBoxes = !$(e.target).prop('checked')
-}
 
 function updateTimeStats(timeInMs) {
   forwardTimes = [timeInMs].concat(forwardTimes).slice(0, 30)
   const avgTimeInMs = forwardTimes.reduce((total, t) => total + t) / forwardTimes.length
-  $('#time').val(`${Math.round(avgTimeInMs)} ms`)
-  $('#fps').val(`${faceapi.round(1000 / avgTimeInMs)}`)
 }
 
 function howDoIFeel(apiResult) {
@@ -26,7 +21,7 @@ function howDoIFeel(apiResult) {
 }
 
 async function onPlay() {
-  const videoEl = $('#inputVideo').get(0)
+  const videoEl = document.getElementById('inputVideo');
 
   if(videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded())
 	return setTimeout(() => onPlay())
@@ -40,17 +35,18 @@ async function onPlay() {
   const result1 = await faceapi.detectSingleFace(videoEl, options).withFaceExpressions()
   
   try {
-	$("#emotion_display").text(howDoIFeel(result1)["expression"]);
+	document.getElementById("emotion_display").innerText = howDoIFeel(result1)["expression"];
   }
   catch(err) {
+	document.getElementById("emotion_display").innerText = "No face detected";
+      //TODO if we can't recognize a face that means that they stepped away. After five seconds create an alert and foreground the app
 	console.log(err)
   }
 
   updateTimeStats(Date.now() - ts)
 
   if (result && result1) {
-	drawLandmarks(videoEl, $('#overlay').get(0), [result], withBoxes)
-	//drawExpressions(videoEl, $('#overlay1').get(0), [result1], withBoxes)
+	drawLandmarks(videoEl, document.getElementById('overlay'), [result], withBoxes)
   }
 
   setTimeout(() => onPlay())
@@ -66,13 +62,12 @@ async function run() {
   // try to access users webcam and stream the images
   // to the video element
   const stream = await navigator.mediaDevices.getUserMedia({ video: {} })
-  const videoEl = $('#inputVideo').get(0)
+  const videoEl = document.getElementById('inputVideo');
   videoEl.srcObject = stream
 }
 
 function updateResults() {}
 
-$(document).ready(function() {
-  initFaceDetectionControls()
+document.addEventListener("DOMContentLoaded", function(event) { 
   run()
-})
+});
