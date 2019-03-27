@@ -32,32 +32,23 @@
                 <div class="row">
                     <div class="col-12 text-center">
                         <h3 style="color: red;">
-                            Focus is paramount to success.
+                            Your face is out of camera range.
                         </h3>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 text-center">
-                        Our AI has detected that you are away from the computer.
+                    <div class="col-12 text-center" style="margin-bottom: 25px; margin-top: 25px;">
+                        I've detected that you are away from the computer. Until I detect your face again I won't count this time to your total study time.
                     </div>
                 </div>
                 <div class="row justify-content-center">
                     <div class="col-2">
-                        <button class="btn btn-primary btn-block" id="close_distraction_overlay_button">
-                            Got it
+                        <button class="btn btn-primary btn-block" id="close_away_overlay_button">
+                            I'm back!
                         </button>
                     </div>
                 </div>
-                <div class="row justify-content-center">
-                    <div class="col-5">
-                        <a href="#" id="make_relevant_overlay_link">
-                            Add this page to your study topic.
-                        </a>
-                    </div>
-                </div>
             </div>
-
-
 
 
 
@@ -77,22 +68,24 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 text-center">
-                        Our AI has detected that you are distracted. If this is in error please add this page to your study topic. 
-                        Otherwise now is a good time to get back to studying.
+                    <div class="col-12 text-center" style="margin-bottom: 25px; margin-top: 25px;">
+                        I believe that you are distracted because the keywords on this page don't match the keywords from your study.
+                        I'll help you get back on track if you push the "Back to Studying" button below.
+                        <p>
+                        If this page is relevant then please add keywords from this page to your topic using the link below.
                     </div>
                 </div>
                 <div class="row justify-content-center">
-                    <div class="col-2">
+                    <div class="col-3">
                         <button class="btn btn-primary btn-block" id="close_distraction_overlay_button">
                             Back to Studying
                         </button>
                     </div>
                 </div>
-                <div class="row justify-content-center">
+                <div class="row justify-content-center disabled">
                     <div class="col-5">
                         <a href="#" id="make_relevant_overlay_link">
-                            Add this page to your study topic.
+                            Add topics from this page to your study.
                         </a>
                     </div>
                 </div>
@@ -101,7 +94,7 @@
             <div class="container" id="relevant_overlay_content">
                 <div class="row">
                     <div class="col-12">
-                        Help make the selected icon relevant
+                        Here are the topics I've recognized on this page. Please tell me which ones are relevant to your study and I'll look for them from now on.
                     </div>
                 </div>
             </div>
@@ -195,7 +188,7 @@
 
                     <!-- Video of the user (for the demo) -->
 
-                    <div class="col-4" style="background: white;">
+                    <div class="col-4" style="background: url('chrome_camera_permissions.jpg');">
                         <div id="tf_canvas" class="row">
                             <video id="inputVideo" autoplay muted></video>
                             <canvas id="overlay" />

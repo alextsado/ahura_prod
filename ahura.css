@@ -116,7 +116,7 @@ h3 {
     margin-top: 45px;
     display: none;
 }
-#distracted_overlay_content    {
+#distracted_overlay_content, #away_from_computer_overlay_content, #relevant_overlay_content {
     margin-top: 45px;
     padding-top: 35px;
     min-height: 350px;

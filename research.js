@@ -41,6 +41,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 window.onload = function(){
     setup_display();
 
+    document.getElementById("close_away_overlay_button").addEventListener("click",
+        event => hide_away_overlay(event));
+
     document.getElementById("close_distraction_overlay_button").addEventListener("click",
         event => get_back_to_studying(event));
 
@@ -102,6 +105,13 @@ function show_distracted_overlay(){
 }
 
 /**
+ * Hide the overlay that was telling the user that we think they've stepped away from the computer.
+ */
+function hide_away_overlay(){
+    document.getElementById("overlay_bg").style.display = "none";
+    document.getElementById("away_from_computer_overlay_content").style.display = "none";
+}
+/**
  * Hide the overlay that was telling the user that we think they're distracted.
  */
 function hide_distracted_overlay(){
@@ -118,7 +128,7 @@ function get_back_to_studying(event){
     hide_distracted_overlay();
     distraction_counter--;
     chrome.storage.sync.get("keywords", results => {
-        let keywords_list = results.keywords.split("~");
+        let keywords_list = results.keywords.split("~").filter(el => el.length > 0);
         let relevant_topic = keywords_list[0];
         let win = window.open(`https://google.com/search?q=${relevant_topic}`, '_blank');
         win.focus();
@@ -252,7 +262,7 @@ function setup_display(){
            console.error("THERE WAS SOMETHING WRONG WITH SAVING THE SESSION"); 
         }
         
-        let keywords_list = result.keywords.split("~");
+        let keywords_list = result.keywords.split("~").filter(el => el.length > 0);
         let keywords_tags = `
                 ${keywords_list.map( keyword => ` 
                     <div class="col-4 keyword_list_item">
