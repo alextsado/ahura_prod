@@ -119,7 +119,7 @@ function show_distracted_overlay(){
  */
 function hide_relevant_overlay(){
     document.getElementById("overlay_bg").style.display = "none";
-    document.getElementById("away_from_computer_overlay_content").style.display = "none";
+    document.getElementById("relevant_overlay_content").style.display = "none";
     document.getElementById("populate_make_relevant").innerHTML = "";
 }
 

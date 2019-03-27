@@ -8,8 +8,6 @@
 
 "use strict";
 import { globals } from "./globals.js";
-//import { media } from "./mediaLib.js";
-//TODO don't import media or make it so that importing it doesn't turn on the camera
 
 /*
  * Route messages from other parts of the app accordingly.
