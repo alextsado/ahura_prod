@@ -2,7 +2,7 @@
     description and some additional keywords
 
     @Author Barnaby B
-    @Since Nov 15, 2018
+    @Since March 2018
 -->
 <html>
     <head>
@@ -91,11 +91,18 @@
             </div>
 
             <div class="container" id="relevant_overlay_content">
-                <div class="row">
-                    <div class="col-12">
+                <div class="row justify-content-center">
+                    <div class="col-10">
                         Here are the topics I've recognized on this page. Please tell me which ones are relevant to your study and I'll look for them from now on.
                     </div>
                 </div>
+                <div class="row" id="populate_make_relevant">
+                    &nbsp;
+                </div>
+                <div class="row">
+                    <button type="button" class="btn btn-secondary" id="make_relevant_cancel_button">Cancel</button>
+                </div>
+
             </div>
         </div>
 
@@ -187,7 +194,7 @@
 
                     <!-- Video of the user (for the demo) -->
 
-                    <div class="col-4" style="background: url('chrome_camera_permissions.jpg');">
+                    <div class="col-4" style="background: url('chrome_camera_permissions.jpg'); background-repeat: no-repeat; background-size: 300px 250px;">
                         <div id="tf_canvas" class="row">
                             <video id="inputVideo" autoplay muted></video>
                             <canvas id="overlay" />

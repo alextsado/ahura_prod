@@ -2,7 +2,7 @@
  * Control the popup page
  *
  * @Author Barnaby B.
- * @Since Nov 14, 2018
+ * @Since March 2019
  */
 "use strict";
 //import { media } from "./mediaLib.js";
@@ -41,6 +41,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 window.onload = function(){
     setup_display();
 
+    document.getElementById("make_relevant_overlay_link").addEventListener("click",
+        event => hide_distracted_overlay(event));
+
+    document.getElementById("make_relevant_cancel_button").addEventListener("click",
+            event => hide_relevant_overlay(event));
+
     document.getElementById("close_away_overlay_button").addEventListener("click",
         event => hide_away_overlay(event));
 
@@ -50,17 +56,22 @@ window.onload = function(){
     document.querySelector("#stop_session").addEventListener("click",
         event =>  stop_session_click(event));
 
-    //handle dynamically added elements through bubbling
+    // Handle dynamically added 'make relevant' links through bubbling
+    document.querySelector("#populate_make_relevant").addEventListener("click", event => {
+        let target = event.target;
+        if(target.classList.contains("keyword_link")){
+            keyword_click(event);
+        }
+    });
+
+
+    //handle dynamically added webpage list items through bubbling
     document.querySelector("#add_pages_visited").addEventListener("click", event => {
         let target = event.target;
         if(target.classList.contains("make_relevant_button")){
             show_relevant_keywords(event);
-        }else if(target.classList.contains("keyword_link")){
-            keyword_click(event);
         }else if(target.classList.contains("make_transitional_button")){
             make_transitional(event);
-        }else if(target.classList.contains("cancel_button")){
-            keyword_cancel_click(event);
         }
     });
 }
@@ -102,6 +113,15 @@ function adjust_distraction_counter(is_relevant){
 function show_distracted_overlay(){
     document.getElementById("overlay_bg").style.display = "block";
     document.getElementById("distracted_overlay_content").style.display = "block";
+}
+
+/**
+ * Hide the overlay that was telling the user that we think they've stepped away from the computer.
+ */
+function hide_relevant_overlay(){
+    document.getElementById("overlay_bg").style.display = "none";
+    document.getElementById("away_from_computer_overlay_content").style.display = "none";
+    document.getElementById("populate_make_relevant").innerHTML = "";
 }
 
 /**
@@ -179,8 +199,11 @@ function summary_text(msg, sender, sendResponse){
 
 
             const page_id = xhr.response.page_id;
+            const keywords = xhr.response.keywords;
 
             let yes_class = (!xhr.response.is_transitional & xhr.response.is_relevant) ? 'btn-success' : 'btn-light';
+            let mr_class = (!xhr.response.is_transitional & !xhr.response.is_relevant) ? 'make_relevant_button' : '';
+            let mt_class = (!xhr.response.is_transitional & !xhr.response.is_relevant) ? 'make_relevant_button' : ''; //TODO add this to the transitional button bellow
             let no_class = (!xhr.response.is_transitional & !xhr.response.is_relevant) ? 'btn-danger' : 'btn-light';
             let transit_class = xhr.response.is_transitional ? 'btn-secondary' : 'btn-light';
             let page_visited_template = `
@@ -191,13 +214,15 @@ function summary_text(msg, sender, sendResponse){
                         <div class="col-7 row">
                             ${msg.doc_title}
                         </div>
-                        <button class="span-1 btn ${yes_class}">
+                        <button class="span-1 btn ${yes_class} ${mr_class}"
+                                page_id="${page_id}"
+                                noun_keywords="${keywords}">
                             Yes
                         </button>
-                        <button class="span-1 btn ${no_class} ">
+                        <button class="span-1 btn ${no_class}" disabled>
                             No
                         </button>
-                        <button class="span-1 btn ${transit_class}">
+                        <button class="span-1 btn ${transit_class}" disabled>
                             Transit
                         </button>
                     </div>
@@ -234,13 +259,12 @@ function summary_text(msg, sender, sendResponse){
  */
 function stop_session_click(){
     let stop_time = new Date();
-    //TODO add a spinner?
     chrome.runtime.sendMessage({
         "type": "stop_session",
         "stop_time": stop_time.getTime(),
     }, response => {
         window.onbeforeunload = null;
-        media.stop_recording();
+        //media.stop_recording();
         window.location = "enter_topic.html";
         return true;
     });
