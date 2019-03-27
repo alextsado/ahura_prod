@@ -7,7 +7,6 @@
  */
 
 import { globals } from "./globals.js";
-import { hide_relevant_overlay } from "./research.js";
 
 /*
  * Clicking on a 'make relevant' link shows the list of keywords
