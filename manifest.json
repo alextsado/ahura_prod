@@ -1,7 +1,7 @@
  {
-    "name": "Ahura AI Study Sprint Demo",
+    "name": "Ahura AI Study Sprints",
     "short_name": "Ahura Demo",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "author": "Ahura AI",
     "homepage_url": "https://www.ahuraai.com",
     "description": "The first iteration of Ahura AI's technology, packaged as a study sprint tool.",

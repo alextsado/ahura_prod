@@ -100,6 +100,7 @@ h3 {
     background-color: white;
 }
 #overlay_bg {
+    position: fixed;
     height: 100%;
     width: 100%;
     display: none;
@@ -117,6 +118,8 @@ h3 {
 }
 #distracted_overlay_content    {
     margin-top: 45px;
+    padding-top: 35px;
+    min-height: 350px;
     display: none;
     background-color: white;
 }

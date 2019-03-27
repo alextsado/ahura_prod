@@ -251,7 +251,6 @@ function setup_display(){
         if(!result || !result.session_id || !result.user_name || new Date() > new Date(result.end_time)){
            console.error("THERE WAS SOMETHING WRONG WITH SAVING THE SESSION"); 
         }
-
         
         let keywords_list = result.keywords.split("~");
         let keywords_tags = `
@@ -264,7 +263,6 @@ function setup_display(){
 
 
         document.getElementById("populate_keywords").innerHTML = keywords_tags;
-
         document.getElementById("populate_description").innerText = result.description;
         
         // calculate how much time is left in the session
@@ -295,6 +293,5 @@ function setup_display(){
             window.onbeforeunload = null;
             window.location = "enter_topic.html";
         }, duration);
-
     });
 }

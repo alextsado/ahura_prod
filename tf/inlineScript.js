@@ -1,5 +1,8 @@
 /**
- * copied from the inline javascript of a face-api demo so that it works as a plugin
+ * copied from the inline javascript of a face-api demo so that it works as a plugin.
+ * Modified to no longer use jQuery.
+ *
+ * @modified by Barnaby Bienkowski
  */
 let forwardTimes = []
 let withBoxes = true
@@ -19,6 +22,30 @@ function howDoIFeel(apiResult) {
   }
   return answer
 }
+let away_from_computer_counter = null;
+
+function show_away_from_computer_overlay(){
+    document.getElementById("overlay_bg").style.display = "block";
+    document.getElementById("away_from_computer_overlay_content").style.display = "block";
+
+
+}
+
+function trigger_away_from_computer(){
+    if(!away_from_computer_counter){
+        away_from_computer_counter = setTimeout(function(){
+            show_away_from_computer_overlay();
+        }, 5000);
+    } 
+}
+
+function trigger_at_computer(){
+    if(!!away_from_computer_counter){
+        clearTimeout(away_from_computer_counter);
+        away_from_computer_counter = null;
+    }
+}
+
 
 async function onPlay() {
   const videoEl = document.getElementById('inputVideo');
@@ -35,11 +62,14 @@ async function onPlay() {
   const result1 = await faceapi.detectSingleFace(videoEl, options).withFaceExpressions()
   
   try {
-	document.getElementById("emotion_display").innerText = howDoIFeel(result1)["expression"];
+    howDoIFeel(result1)["expression"];
+	document.getElementById("emotion_display").innerText = "User detected.";
+    trigger_at_computer();
+	//document.getElementById("emotion_display").innerText = howDoIFeel(result1)["expression"];
   }
   catch(err) {
-	document.getElementById("emotion_display").innerText = "No face detected";
-      //TODO if we can't recognize a face that means that they stepped away. After five seconds create an alert and foreground the app
+	document.getElementById("emotion_display").innerText = "No user detected.";
+    trigger_away_from_computer();
 	console.log(err)
   }
 
