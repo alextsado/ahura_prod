@@ -25,10 +25,12 @@ function howDoIFeel(apiResult) {
 let away_from_computer_counter = null;
 
 function show_away_from_computer_overlay(){
+   chrome.runtime.sendMessage({
+        "type": "open_window"
+    });
+
     document.getElementById("overlay_bg").style.display = "block";
     document.getElementById("away_from_computer_overlay_content").style.display = "block";
-
-
 }
 
 function trigger_away_from_computer(){

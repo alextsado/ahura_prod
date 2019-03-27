@@ -98,7 +98,6 @@ function adjust_distraction_counter(is_relevant){
     }else if(!is_relevant && distraction_counter < distraction_threshold){
         distraction_counter++;
         if(distraction_counter >= distraction_threshold){
-            console.log("front-end: about to foreground");
             chrome.runtime.sendMessage({
                 "type": "open_window"
             });
