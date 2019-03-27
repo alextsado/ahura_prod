@@ -72,6 +72,9 @@ export function user_name_click(){
         document.querySelector("#user_name_input").focus();
         document.querySelector("#user_name_input").style.border = "2px solid red";
         document.querySelector("#error_content").style.display = "block";
+
+        let topic_submission_spinner = document.querySelector("#topic_submission_spinner");
+        topic_submission_spinner.parentNode.removeChild(topic_submission_spinner);
         //document.querySelector("#user_name_submit").append("Please fill in a name and resubmit.");
     }else{ //username is good
         console.log("username is ", user_name);
