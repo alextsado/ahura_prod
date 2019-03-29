@@ -7,6 +7,7 @@
 "use strict";
 //import { media } from "./mediaLib.js";
 import { show_relevant_keywords, keyword_click, keyword_cancel_click } from "./keywords.js";
+import { escape_for_display } from "./escape_for_display.js";
 import { make_transitional } from "./transitional.js";
 import { globals } from "./globals.js";
 
@@ -197,8 +198,8 @@ function summary_text(msg, sender, sendResponse){
             }
 
 
-            const page_id = xhr.response.page_id;
-            const keywords = xhr.response.keywords;
+            const page_id = escape_for_display(xhr.response.page_id);
+            const keywords = escape_for_display(xhr.response.keywords);
 
             let yes_class = (!xhr.response.is_transitional & xhr.response.is_relevant) ? 'btn-success' : 'btn-light';
             let mr_class = (!xhr.response.is_transitional & !xhr.response.is_relevant) ? 'make_relevant_button' : '';
@@ -285,7 +286,7 @@ function setup_display(){
            console.error("THERE WAS SOMETHING WRONG WITH SAVING THE SESSION"); 
         }
         
-        let keywords_list = result.keywords.split("~").filter(el => el.length > 0);
+        let keywords_list = result.keywords.split("~").filter(el => el.length > 0).map(el => escape_for_display(el));
         let keywords_tags = `
                 ${keywords_list.map( keyword => ` 
                     <div class="col-4 keyword_list_item">
@@ -293,7 +294,6 @@ function setup_display(){
                     </div>
                 `).join('')}
         `
-
 
         document.getElementById("populate_keywords").innerHTML = keywords_tags;
         document.getElementById("populate_description").innerText = result.description;

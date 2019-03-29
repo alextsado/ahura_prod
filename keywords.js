@@ -7,6 +7,7 @@
  */
 
 import { globals } from "./globals.js";
+import { escape_for_display } from "./escape_for_display.js";
 
 /*
  * Clicking on a 'make relevant' link shows the list of keywords
@@ -18,7 +19,7 @@ export function show_relevant_keywords(event){
     let button_pressed = event.target;
     let keywords = button_pressed.getAttribute("noun_keywords");
     //button_pressed.classList.add("isDisabled");
-    let keywords_list = keywords.split("~").filter(el => el.length > 0);
+    let keywords_list = keywords.split("~").filter(el => el.length > 0).map(el => escape_for_display(el));
     let page_id = button_pressed.getAttribute("page_id");
 
 

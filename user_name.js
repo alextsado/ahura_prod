@@ -105,4 +105,3 @@ function create_topic_submission_spinner(){
     spinner.style.width = "150px";
     document.querySelector("#collection_content").append(spinner);
 }
-
