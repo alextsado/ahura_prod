@@ -171,66 +171,62 @@ function summary_text(msg, sender, sendResponse){
         "is_relevant": true,
         "tab_id": sender.tab.id
     }
-    let xhr = new XMLHttpRequest();
 
-    xhr.onreadystatechange = function(){
-        if(xhr.readyState === 4 && xhr.status <= 299 && !!xhr.response){
-            console.log("xhr ready state was 200 with a response at " + new Date());
-            const time_loaded = new Date().getTime();
+     function show_pages_results(response){
+        const time_loaded = new Date().getTime();
 
-            console.log(xhr.response);
-            if(!xhr.is_transitional){
-                adjust_distraction_counter(xhr.response.is_relevant);
-            }
-
-            let add_pages_visited = document.querySelector("#add_pages_visited");
-            if(!!add_pages_visited.firstElementChild){
-                let time_div = add_pages_visited.firstElementChild.getElementsByClassName("populate_time_spent")[0];
-                let previous_time = time_div.getAttribute("time_loaded");
-                let time_delta = (time_loaded - Number(previous_time))/1000;
-                let time_delta_mins = Math.floor(time_delta/60);
-                let time_delta_secs = Math.floor(time_delta%60);
-                if(time_delta_secs < 10){
-                    time_delta_secs = "0" + time_delta_secs;
-                }
-                let display_time = `${time_delta_mins}:${time_delta_secs}`;
-                time_div.innerText = display_time;
-            }
-
-
-            const page_id = escape_for_display(xhr.response.page_id);
-            const keywords = escape_for_display(xhr.response.keywords);
-
-            let yes_class = (!xhr.response.is_transitional & xhr.response.is_relevant) ? 'btn-success' : 'btn-light';
-            let mr_class = (!xhr.response.is_transitional & !xhr.response.is_relevant) ? 'make_relevant_button' : '';
-            let mt_class = (!xhr.response.is_transitional & !xhr.response.is_relevant) ? 'make_relevant_button' : ''; //TODO add this to the transitional button bellow
-            let no_class = (!xhr.response.is_transitional & !xhr.response.is_relevant) ? 'btn-danger' : 'btn-light';
-            let transit_class = xhr.response.is_transitional ? 'btn-secondary' : 'btn-light';
-            let page_visited_template = `
-                    <div class="row page_list_item" page_id="${page_id}">
-                        <div class="col-2 populate_time_spent" time_loaded="${time_loaded}">
-                            . . .
-                        </div>
-                        <div class="col-7 row">
-                            ${msg.doc_title}
-                        </div>
-                        <button class="span-1 btn ${yes_class} ${mr_class}"
-                                page_id="${page_id}"
-                                noun_keywords="${keywords}">
-                            Yes
-                        </button>
-                        <button class="span-1 btn ${no_class}" disabled>
-                            No
-                        </button>
-                        <button class="span-1 btn ${transit_class}" disabled>
-                            Transit
-                        </button>
-                    </div>
-                `
-            
-            add_pages_visited.insertAdjacentHTML(
-                "afterbegin", page_visited_template); //afterbegin prepends it, beforeend appends
+        console.log(response);
+        if(!response.is_transitional){
+            adjust_distraction_counter(response.is_relevant);
         }
+
+        let add_pages_visited = document.querySelector("#add_pages_visited");
+        if(!!add_pages_visited.firstElementChild){
+            let time_div = add_pages_visited.firstElementChild.getElementsByClassName("populate_time_spent")[0];
+            let previous_time = time_div.getAttribute("time_loaded");
+            let time_delta = (time_loaded - Number(previous_time))/1000;
+            let time_delta_mins = Math.floor(time_delta/60);
+            let time_delta_secs = Math.floor(time_delta%60);
+            if(time_delta_secs < 10){
+                time_delta_secs = "0" + time_delta_secs;
+            }
+            let display_time = `${time_delta_mins}:${time_delta_secs}`;
+            time_div.innerText = display_time;
+        }
+
+
+        const page_id = escape_for_display(response.page_id);
+        const keywords = escape_for_display(response.keywords);
+
+        let yes_class = (!response.is_transitional & response.is_relevant) ? 'btn-success' : 'btn-light';
+        let mr_class = (!response.is_transitional & !response.is_relevant) ? 'make_relevant_button' : '';
+        let mt_class = (!response.is_transitional & !response.is_relevant) ? 'make_relevant_button' : ''; //TODO add this to the transitional button bellow
+        let no_class = (!response.is_transitional & !response.is_relevant) ? 'btn-danger' : 'btn-light';
+        let transit_class = response.is_transitional ? 'btn-secondary' : 'btn-light';
+        let page_visited_template = `
+                <div class="row page_list_item" page_id="${page_id}">
+                    <div class="col-2 populate_time_spent" time_loaded="${time_loaded}">
+                        . . .
+                    </div>
+                    <div class="col-7 row">
+                        ${msg.doc_title}
+                    </div>
+                    <button class="span-1 btn ${yes_class} ${mr_class}"
+                            page_id="${page_id}"
+                            noun_keywords="${keywords}">
+                        Yes
+                    </button>
+                    <button class="span-1 btn ${no_class}" disabled>
+                        No
+                    </button>
+                    <button class="span-1 btn ${transit_class}" disabled>
+                        Transit
+                    </button>
+                </div>
+            `
+        
+        add_pages_visited.insertAdjacentHTML(
+            "afterbegin", page_visited_template); //afterbegin prepends it, beforeend appends
     }
 
     chrome.storage.sync.get(["session_id", "start_time", "user_id"], results => {
@@ -242,6 +238,17 @@ function summary_text(msg, sender, sendResponse){
             method: "POST",
             headers: { "Content-Type": "application/json;charset=UTF-8"},
             body: JSON.stringify(pkg),
+        }).then(response => {
+            if(response.ok){
+                return response.json();
+            }else{
+                throw new Error("Network response was not OK");
+            }
+        }).then( response => {
+            show_pages_results(response);
+        }).catch( error => {
+            //TODO put something on the page that says a page result failed to register
+            console.log("THERE WAS AN ERROR SHOWING A PAGE!!!");
         });
     });
     return true;

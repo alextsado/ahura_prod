@@ -54,7 +54,6 @@ export function keyword_cancel_click(event){
  * Clicking on a keyword sends an ajax request to make the page legit.
  */
 export function keyword_click(event){
-    debugger;
     let keyword_link = event.target;
     let new_keyword = keyword_link.innerText;
     let page_id = keyword_link.getAttribute("page_id");

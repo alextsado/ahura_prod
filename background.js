@@ -70,8 +70,7 @@ function open_window(){
         }
     }
     if(!chat_window){
-        fetch(`${globals.api_url}/ping-when-plugin-opened/`, {method: "get"})
-        //TODO check whether there is a username. If no username then open user_name.html, otherwise enter_topic.htl
+        fetch(`${globals.api_url}/ping-when-plugin-opened/`, {method: "GET"});
         chrome.storage.sync.get(["user_id"], results => {
             let open_url;// = "research.html";
             if(!!results && !!results.user_id){
@@ -97,8 +96,12 @@ chrome.windows.onRemoved.addListener(window_id => {
     if(!!chat_window && window_id === chat_window.id){
         chat_window = null;
     }
-    let stop_time = new Date().getTime();
-    stop_session({"stop_time": stop_time});
+    chrome.storage.sync.get(["session_id"], results => {
+        if(!!results && !!results.session_id){
+            let stop_time = new Date().getTime();
+            stop_session({"stop_time": stop_time});
+        }
+    });
 });
 
 
@@ -120,7 +123,7 @@ function stop_session(msg, sender, sendResponse){
 
     chrome.storage.sync.get(["session_id", "start_time", "user_id"], results => {
         if(!results || !results.session_id){
-            throw new Exception("There is no session ID but we called STOP on it");
+            console.error("There is no session ID but we called STOP on it");
         }
         session_id = results.session_id;
 
@@ -132,18 +135,19 @@ function stop_session(msg, sender, sendResponse){
                 "Content-Type": "application/json"
             },
             credentials: "same-origin"
-        }).then(function(response) {
-
-            if (response.status <= 299) {
+        }).then(function(response){
+            if(response.status <= 299){
                 //media.stop_recording();
                 chrome.storage.sync.set({
                     "session_id": null,
                     "start_time": null
                 });
-                sendResponse({"success": true});
+                if(!!sendResponse){
+                    sendResponse({"success": true});
+                }
             }  
-        }, function(error) {
-            console.log(error.message); //=> String
-        })
+        }, function(error){
+            console.log(error.message);
+        });
     });
 }
