@@ -97,58 +97,9 @@ chrome.windows.onRemoved.addListener(window_id => {
     if(!!chat_window && window_id === chat_window.id){
         chat_window = null;
     }
+    let stop_time = new Date().getTime();
+    stop_session({"stop_time": stop_time});
 });
-
-
-/*
- * Handle a summary text  message from the content page
- */
-function summary_text(msg, sender, sendResponse){
-
-    let pkg = {
-            "url": sender.url,
-            "content": msg.message,
-            "load_time": msg.load_time
-        }
-
-    chrome.storage.sync.get(["session_id", "end_time", "user_id"], results => {
-        if(!results || !results.session_id){
-            throw new Exception("There is no session ID but we called STOP on it");
-        }
-        pkg["session_id"] = results.session_id;
-        
-        fetch(`${globals.api_url}/pages/`, {
-            method: "POST",
-            body: JSON.stringify(pkg),
-            headers: {
-            "Content-Type": "application/json"
-            },
-            credentials: "same-origin"
-        }).then(function(response) {
-
-            if (response.status <= 299) {
-
-                chrome.storage.sync.set({
-                    "is_relevant" : response.is_relevant,
-                    "keywords": response.keywords,
-                    "page_id": response.page_id
-                });
-            }  
-            //response.statusText //=> String
-            //response.headers    //=> Headers
-            //response.url        //=> String
-        
-            //return response.text()
-        }, function(error) {
-            console.log(error.message); //=> String
-        })
-        
-
-    });
-    return true;
-
-
-}
 
 
 /**
@@ -160,7 +111,6 @@ function summary_text(msg, sender, sendResponse){
 function stop_session(msg, sender, sendResponse){
 
     //media.stop_recording();
-    globals.session_end_timer = null;
     let session_id = null;
     let pkg = {
         "user_id": user_id,
@@ -168,7 +118,7 @@ function stop_session(msg, sender, sendResponse){
     }
 
 
-    chrome.storage.sync.get(["session_id", "end_time", "user_id"], results => {
+    chrome.storage.sync.get(["session_id", "start_time", "user_id"], results => {
         if(!results || !results.session_id){
             throw new Exception("There is no session ID but we called STOP on it");
         }
@@ -179,7 +129,7 @@ function stop_session(msg, sender, sendResponse){
             method: "POST",
             body: JSON.stringify(pkg),
             headers: {
-            "Content-Type": "application/json"
+                "Content-Type": "application/json"
             },
             credentials: "same-origin"
         }).then(function(response) {
@@ -188,18 +138,12 @@ function stop_session(msg, sender, sendResponse){
                 //media.stop_recording();
                 chrome.storage.sync.set({
                     "session_id": null,
-                    "end_time": null
+                    "start_time": null
                 });
                 sendResponse({"success": true});
             }  
-            //response.statusText //=> String
-            //response.headers    //=> Headers
-            //response.url        //=> String
-        
-            //return response.text()
         }, function(error) {
             console.log(error.message); //=> String
         })
-
     });
 }

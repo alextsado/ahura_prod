@@ -13,9 +13,15 @@ The folder structure is pretty abysmal. I keep meaning to organize it.
 
 ## Installing
 To install the plugin for development on Chrome go to chrome://extensions, enable "developer mode" on the top-right, click on "load unpacked" on the top left and find the code directory of this project.
+To prepare it for upload create a zip by running the following command:
+
+'''
+zip -r -FS FirefoxDistractionPlugin.zip * --exclude *.git*
+'''
+Then upload it to the Chrome web store.
 
 To install the plugin for development on Firefox go to about:addons and select "Debug Addons" then navigate to the location of the manifest.json file. 
-To install the plugin for usage please upload it to the Firefox add-ons store for private use (e.g. do not publish a public URL).
+To install the plugin for usage please upload it to the Firefox add-ons store for private use (e.g. do not publish a public URL). Use the same zip command above.
 
 No further action is needed to get the code working at this time.
 

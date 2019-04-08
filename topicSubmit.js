@@ -18,7 +18,6 @@ export function submit_button_click(event){
      inputVideo.on("play", onPlay);
 
     let description = document.querySelector("[name=description]").value
-    let duration = document.querySelector("[name=duration]").value;
     document.querySelector("#tf_canvas").style.display = "contents";
     document.querySelector("#tf_emotion").style.display = "contents";
     document.querySelector("#error_content").style.display = "none";
@@ -26,7 +25,6 @@ export function submit_button_click(event){
         create_topic_submission_spinner();
         topic_submit({
             "description": description, 
-            'duration': duration,
             'time_started': time_started.getTime()
         }).then(set_session_id_remove_spinner, show_error_text);
     }else{
@@ -94,8 +92,7 @@ function topic_submit(msg){
                     "user_id": results.user_id,
                     "time_started": msg.time_started,
                     "description": msg.description,
-                    "additional_keywords": msg.additional_keywords,
-                    "duration": msg.duration
+                    "additional_keywords": msg.additional_keywords
                 }),
                 headers: {
                     "Content-Type": "application/json;charset=UTF-8"
@@ -109,24 +106,8 @@ function topic_submit(msg){
                 }
             }).then(response => {
 
-                /*
-                 * set the session_end timer to end in the correct number of minutes
-                 */
-                console.log("setting session_end_timer");
-                globals.session_end_timer = setTimeout(function(){
-                    chrome.runtime.sendMessage({"type": "end_session"});
-                    chrome.storage.sync.set({
-                        "session_id": null,
-                        "description": null, 
-                        "keywords": null,
-                        "end_time": null
-                    });
-                }, msg.duration*60000);
-
-                let end_time = msg.time_started + msg.duration* 60000;
                 chrome.storage.sync.set({
                     "session_id": response.session_id,
-                    "end_time": end_time,
                     "description": msg.description,
                     "keywords": response.keywords}, result => {
                         console.log("saved session to disk " + new Date().getTime());

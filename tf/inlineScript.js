@@ -52,16 +52,23 @@ function trigger_at_computer(){
 async function onPlay() {
   const videoEl = document.getElementById('inputVideo');
 
-  if(videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded())
-	return setTimeout(() => onPlay())
+  if(videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded()){
+	return setTimeout(() => onPlay());
+  }
 
 
   const options = getFaceDetectorOptions()
 
   const ts = Date.now()
+    let result, result1;
 
-  const result = await faceapi.detectSingleFace(videoEl, options).withFaceLandmarks()
-  const result1 = await faceapi.detectSingleFace(videoEl, options).withFaceExpressions()
+    try{
+      result = await faceapi.detectSingleFace(videoEl, options).withFaceLandmarks()
+      result1 = await faceapi.detectSingleFace(videoEl, options).withFaceExpressions()
+    }catch(e){
+        //const result = null;
+        //const result1 =null;
+    }
   
   try {
     howDoIFeel(result1)["expression"];
@@ -77,7 +84,7 @@ async function onPlay() {
 
   updateTimeStats(Date.now() - ts)
 
-  if (result && result1) {
+  if(!!result && !!result1) {
 	drawLandmarks(videoEl, document.getElementById('overlay'), [result], withBoxes)
   }
 

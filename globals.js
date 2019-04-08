@@ -4,8 +4,6 @@
 
 export let globals = {
 
-    session_end_timer: null,
-
     is_ongoing_session: false,
 
     // TODO Switch these before deployment to production

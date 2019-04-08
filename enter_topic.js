@@ -40,13 +40,12 @@ window.onbeforeunload = null;
  * When a user clicks the submit button to start a new session
  */
 function submit_button_click(event){
-    let time_started = new Date();
+    let start_time = new Date();
     //TODO remove jQuery!!!
      //var inputVideo = $("#inputVideo");
      //inputVideo.on("play", onPlay);
 
     let description = document.querySelector("[name=description]").value
-    let duration = document.querySelector("[name=duration]").value;
     //document.querySelector("#tf_canvas").style.display = "contents";
     //document.querySelector("#tf_emotion").style.display = "contents";
     //document.querySelector("#error_content").style.display = "none";
@@ -54,8 +53,7 @@ function submit_button_click(event){
         create_topic_submission_spinner();
         topic_submit({
             "description": description, 
-            'duration': duration,
-            'time_started': time_started.getTime()
+            'start_time': start_time.getTime()
         }).then(function(session_id){
             document.location = "research.html";
         }, show_error_text);
@@ -122,10 +120,9 @@ function topic_submit(msg){
             fetch(`${globals.api_url}/sessions/`, {
                 body: JSON.stringify({
                     "user_id": results.user_id,
-                    "time_started": msg.time_started,
+                    "time_started": msg.start_time,
                     "description": msg.description,
                     "additional_keywords": msg.additional_keywords,
-                    "duration": msg.duration
                 }),
                 headers: {
                     "Content-Type": "application/json;charset=UTF-8"
@@ -146,10 +143,9 @@ function topic_submit(msg){
                     let rem_me = document.getElementById("topic_submission_spinner");
                     rem_me.parentElement.removeChild(rem_me);
                 }else{
-                    let end_time = msg.time_started + msg.duration* 60000;
                     chrome.storage.sync.set({
                         "session_id": response.session_id,
-                        "end_time": end_time,
+                        "start_time": msg.start_time,
                         "description": msg.description,
                         "keywords": response.keywords}, result => {
                             resolve(response.session_id);

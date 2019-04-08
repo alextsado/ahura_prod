@@ -17,9 +17,9 @@ import { globals } from "./globals.js";
 
 let session_id;
 let description;
-let end_time;
+let start_time;
 let user_id;
-let session_end_timer;
+let session_timer;
 let distraction_counter = 0;
 let distraction_threshold = 3;
 
@@ -233,16 +233,16 @@ function summary_text(msg, sender, sendResponse){
         }
     }
 
-    chrome.storage.sync.get(["session_id", "end_time", "user_id"], results => {
+    chrome.storage.sync.get(["session_id", "start_time", "user_id"], results => {
         if(!results || !results.session_id){
             throw new Exception("There is no session ID but we called STOP on it");
         }
         pkg["session_id"] = results.session_id;
-        xhr.open("POST", `${globals.api_url}/pages/`)
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        xhr.responseType = "json";
-
-        xhr.send(JSON.stringify(pkg));
+        fetch(`${globals.api_url}/pages/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json;charset=UTF-8"},
+            body: JSON.stringify(pkg),
+        });
     });
     return true;
 }
@@ -280,9 +280,9 @@ function setup_display(){
     var inputVideo = document.getElementById("inputVideo");
     inputVideo.addEventListener("play", onPlay);
 
-    chrome.storage.sync.get(["session_id", "end_time", "user_name", "user_id", "description", "keywords"], result => {
+    chrome.storage.sync.get(["session_id", "start_time", "user_name", "user_id", "description", "keywords"], result => {
         //Check that everything is OK
-        if(!result || !result.session_id || !result.user_name || new Date() > new Date(result.end_time)){
+        if(!result || !result.session_id || !result.user_name){
            console.error("THERE WAS SOMETHING WRONG WITH SAVING THE SESSION"); 
         }
         
@@ -299,32 +299,19 @@ function setup_display(){
         document.getElementById("populate_description").innerText = result.description;
         
         // calculate how much time is left in the session
-        let end_time = new Date(result.end_time)
+        let start_time = new Date(result.start_time)
         function get_timer(){
-            let diff = end_time - new Date(); 
+            let diff = new Date() - start_time; 
             let mins = Math.floor((diff/1000) / 60); 
+            let hours = Math.floor(mins / 60); 
             let secs = Math.floor((diff/1000) % 60); 
-            if(secs < 10){
-                secs = "0" + secs;
-            }
-            return "" + mins + ":" + secs;
+            if(secs < 10){secs = "0" + secs;}
+            if(mins < 10){mins = "0" + mins;}
+            if(hours < 10){hours = "0" + hours;}
+            return `${hours}:${mins}:${secs}`;
         }
         
         //Update the clock every second using the above calculations
         setInterval(function(){document.getElementById("populate_countdown_clock").innerText = get_timer();}, 1000)
-
-        // set the session_end timer to end in the correct number of minutes
-        let duration = end_time - new Date(); 
-        session_end_timer = setTimeout(function(){
-            chrome.runtime.sendMessage({"type": "end_session"});
-            chrome.storage.sync.set({
-                "session_id": null,
-                "description": null, 
-                "keywords": null,
-                "end_time": null
-            });
-            window.onbeforeunload = null;
-            window.location = "enter_topic.html";
-        }, duration);
     });
 }
