@@ -272,7 +272,7 @@ function stop_session_click(){
     }, response => {
         window.onbeforeunload = null;
         //media.stop_recording();
-        window.location = "enter_topic.html";
+        window.location = "/html/enter_topic.html";
         return true;
     });
 }

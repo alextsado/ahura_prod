@@ -1,27 +1,27 @@
  {
-    "name": "Ahura AI Study Sprints",
-    "short_name": "Ahura Demo",
-    "version": "0.1.3",
+    "name": "Ahura AI Study Sessions",
+    "short_name": "Study Sessions",
+    "version": "0.2.00",
     "author": "Ahura AI",
     "homepage_url": "https://www.ahuraai.com",
-    "description": "The first iteration of Ahura AI's technology, packaged as a study sprint tool.",
+    "description": "Focus and measure your study sessions.",
     "manifest_version": 2,
     "browser_action": { 
         "default_title": "Ahura AI Demo.", 
-        "default_icon":  "favicon.png"
+        "default_icon":  "/images/favicon.png"
      },
     "permissions": [
             "storage",
             "https://devapi.spentaai.com/*/*"
     ],
     "background": {
-        "page": "background.html"
+        "page": "html/background.html"
     },
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*"], 
-        "js": ["content.js"]
+        "js": ["src/content.js"]
     }],
     "icons":{
-        "128":"favicon.png"
+        "128":"images/favicon.png"
     }
   }

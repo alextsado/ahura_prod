@@ -74,9 +74,9 @@ function open_window(){
         chrome.storage.sync.get(["user_id"], results => {
             let open_url;// = "research.html";
             if(!!results && !!results.user_id){
-                open_url = "enter_topic.html";
+                open_url = "/html/enter_topic.html";
             }else{
-                open_url = "user_name.html";
+                open_url = "/html/user_name.html";
             }
             chrome.windows.create({
                 url: chrome.runtime.getURL(open_url),

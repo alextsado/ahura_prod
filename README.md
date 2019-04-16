@@ -32,3 +32,14 @@ The code of this plugin (and it's backend server) minus its dependencies, is cur
 ## License 
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE.md](LICENSE.md) file for details
+
+
+## Change Log
+
+In verion 0.1.9 we have:
+
+ * Built upon the code accepted to the Firefox plugins store, so this extension is now available on both Firefox and Chrome
+ * Switched from a "coundown" model where you do a "study sprint" sort of like a Pomodoro, and instead do a "count up" model like a "study session"
+ * Clean the HTML input that comes from forms or from the server before inserting it into templates
+ * Cleaned up the home directory a little bit by moving images into an images/ folder
+ * Moved some old fasioned xhr calls to the more modern and debuggable fetch() calls

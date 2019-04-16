@@ -22,7 +22,6 @@ export function show_relevant_keywords(event){
     let keywords_list = keywords.split("~").filter(el => el.length > 0).map(el => escape_for_display(el));
     let page_id = button_pressed.getAttribute("page_id");
 
-
     let instruction_div = `
             ${keywords_list.map( keyword => ` 
                 <div class="col-4">
@@ -57,8 +56,6 @@ export function keyword_click(event){
     let keyword_link = event.target;
     let new_keyword = keyword_link.innerText;
     let page_id = keyword_link.getAttribute("page_id");
-    console.log("keyword clicked: " + new_keyword);
-    console.log("page_id: " + page_id);
     let pkg = {"new_keyword": new_keyword, "is_relevant": true}
 
     fetch(`${globals.api_url}/pages/${page_id}/`, {
@@ -75,16 +72,14 @@ export function keyword_click(event){
                         ${new_keyword}
                     </div>
             `
-
-
             document.getElementById("populate_keywords").insertAdjacentHTML("afterbegin", keyword_tag);
 
             //TODO change the status of the link to "relevant"
+            //TODO do this by finding the element with page_id=page_id  class=page_list_item
             //TODO add the new keyword into the sync.set({'keywords': new_keyword + existing_keywords})
             document.getElementById("overlay_bg").style.display = "none";
             document.getElementById("away_from_computer_overlay_content").style.display = "none";
             document.getElementById("populate_make_relevant").innerHTML = "";
-            console.log("Successfully added a keyword");
         }  
     }, function(error) {
         console.log(error.message); //=> String

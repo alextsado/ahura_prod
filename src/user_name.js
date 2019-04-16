@@ -79,7 +79,7 @@ export function user_name_click(){
     }else{ //username is good
         console.log("username is ", user_name);
         set_user_name_get_user_id(user_name).then( user_id => {
-            window.location = "enter_topic.html";
+            window.location = "/html/enter_topic.html";
         }).catch( err => {
             console.log(err);
             //TODO something on the UI to show that the AJAX call failed
@@ -97,7 +97,7 @@ function create_topic_submission_spinner(){
     let topic_submission_form = document.getElementById("collection_content");
     //let my_rect = topic_submission_form.getBoundingClientRect();
     let spinner = document.createElement("img");
-    spinner.setAttribute("src", "images/spinner.gif");
+    spinner.setAttribute("src", "/images/spinner.gif");
     spinner.setAttribute("id", "topic_submission_spinner");
     spinner.style.position = "absolute";
     spinner.style.top = "100px";// my_rect.x;

@@ -96,7 +96,7 @@ function create_topic_submission_spinner(){
     let topic_submission_form = document.getElementById("collection_content");
     //let my_rect = topic_submission_form.getBoundingClientRect();
     let spinner = document.createElement("img");
-    spinner.setAttribute("src", "images/spinner.gif");
+    spinner.setAttribute("src", "/images/spinner.gif");
     spinner.setAttribute("id", "topic_submission_spinner");
     spinner.style.position = "absolute";
     spinner.style.top = "100px";// my_rect.x;
