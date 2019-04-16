@@ -70,7 +70,6 @@ function open_window(){
         }
     }
     if(!chat_window){
-        fetch(`${globals.api_url}/ping-when-plugin-opened/`, {method: "GET"});
         chrome.storage.sync.get(["user_id"], results => {
             let open_url;// = "research.html";
             if(!!results && !!results.user_id){

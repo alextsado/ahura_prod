@@ -15,8 +15,6 @@ h3 {
 }
 .page_list_item {
     font-size: 11px;
-    overflow: hidden;
-    white-space: nowrap;
     margin-top: 5px;
     margin-bottom: 0px;
     padding-top: 0.5rem; 
@@ -106,4 +104,42 @@ h3 {
 }
 #add_pages_visited  {
     background-color: white;
+}
+
+.mytooltip {
+    position: relative;
+    display: inline-bloc;
+}
+
+.mytooltip .mytooltiptext {
+    visibility: hidden;
+    width: 140px;
+    background-color: #33b38e;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 1;
+    bottom: 170%;
+    left: 50%; 
+    margin-left: -70px;
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.mytooltip:hover .mytooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+.mytooltip .mytooltiptext::after {
+    content: " ";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #33b38e transparent transparent transparent;
 }

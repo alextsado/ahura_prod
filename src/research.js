@@ -208,18 +208,20 @@ function summary_text(msg, sender, sendResponse){
                     <div class="col-2 populate_time_spent" time_loaded="${time_loaded}">
                         . . .
                     </div>
-                    <div class="col-7 row">
+                    <div class="col-7 row" style="overflow: hidden; white-space: nowrap;">
                         ${msg.doc_title}
                     </div>
-                    <button class="span-1 btn ${yes_class} ${mr_class}"
+                    <button class="col-1 btn ${yes_class} ${mr_class}"
                             page_id="${page_id}"
                             noun_keywords="${keywords}">
-                        Yes
+                        ${ response.is_relevant ? '': '<span class="mytooltip">' }
+                            Yes
+                         ${ response.is_relevant ? '': '<span class="mytooltiptext">Change this page to relevant.</span> </span>' }
                     </button>
-                    <button class="span-1 btn ${no_class}" disabled>
+                    <button class="col-1 btn ${no_class}" disabled>
                         No
                     </button>
-                    <button class="span-1 btn ${transit_class}" disabled>
+                    <button class="col-1 btn ${transit_class}" disabled>
                         Transit
                     </button>
                 </div>
