@@ -4,10 +4,13 @@
 
 export let globals = {
 
+    distraction_counter: 0,
+
+    distraction_threshold: 3,
+
     is_ongoing_session: false,
 
     // TODO Switch these before deployment to production
-
     api_url: "https://devapi.spentaai.com",
     //api_url = "https://api.spentaai.com",
 }

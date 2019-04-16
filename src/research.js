@@ -6,7 +6,7 @@
  */
 "use strict";
 //import { media } from "./mediaLib.js";
-import { show_relevant_keywords, keyword_click, keyword_cancel_click } from "./keywords.js";
+import { show_relevant_keywords, keyword_click, keyword_cancel_click, get_page_list_element } from "./keywords.js";
 import { escape_for_display } from "./escape_for_display.js";
 import { make_transitional } from "./transitional.js";
 import { globals } from "./globals.js";
@@ -20,8 +20,6 @@ let description;
 let start_time;
 let user_id;
 let session_timer;
-let distraction_counter = 0;
-let distraction_threshold = 3;
 
 /*
  * Route any messages relevant to the functionality of the window
@@ -87,28 +85,6 @@ window.onbeforeunload = function(){
     return "Closing this window will end your study session";
 }
 
-
-/**
- * If a page is relevant subtract from the counter. If it's a distraction then add to the counter.
- * It can't go below zero, nor above the threshold.
- * Once it hits the threshold then foreground the window
- */
-function adjust_distraction_counter(is_relevant){
-    console.log("adjust_distraction got called at " + new Date());
-    //TODO check that there is an ongoing session first
-    if(is_relevant && distraction_counter > 0){
-        distraction_counter--;
-    }else if(!is_relevant && distraction_counter < distraction_threshold){
-        distraction_counter++;
-        if(distraction_counter >= distraction_threshold){
-            chrome.runtime.sendMessage({
-                "type": "open_window"
-            });
-            show_distracted_overlay();
-        }
-    }
-}
-
 /**
  * Show an overlay to tell the user that we think they're distracted.
  */
@@ -148,7 +124,7 @@ function hide_distracted_overlay(){
 function get_back_to_studying(event){
     console.log("closing the overlay and taking away one distraction point");
     hide_distracted_overlay();
-    distraction_counter--;
+    globals.distraction_counter--;
     chrome.storage.sync.get("keywords", results => {
         let keywords_list = results.keywords.split("~").filter(el => el.length > 0);
         let relevant_topic = keywords_list[0];
@@ -156,6 +132,7 @@ function get_back_to_studying(event){
         win.focus();
     });
 }
+
 
 // ----------------------------------
 // message Listeners
@@ -174,65 +151,6 @@ function summary_text(msg, sender, sendResponse){
         "tab_id": sender.tab.id
     }
 
-     function show_pages_results(response){
-        const time_loaded = new Date().getTime();
-
-        console.log(response);
-        if(!response.is_transitional){
-            adjust_distraction_counter(response.is_relevant);
-        }
-
-        let add_pages_visited = document.querySelector("#add_pages_visited");
-        let first_child = add_pages_visited.firstElementChild;
-        if(!!first_child && first_child.classList.contains("page_list_item")){
-            let time_div = first_child.getElementsByClassName("populate_time_spent")[0];
-            let previous_time = time_div.getAttribute("time_loaded");
-            let time_delta = (time_loaded - Number(previous_time))/1000;
-            let time_delta_mins = Math.floor(time_delta/60);
-            let time_delta_secs = Math.floor(time_delta%60);
-            if(time_delta_secs < 10){
-                time_delta_secs = "0" + time_delta_secs;
-            }
-            let display_time = `${time_delta_mins}:${time_delta_secs}`;
-            time_div.innerText = display_time;
-        }
-
-
-        const page_id = escape_for_display(response.page_id);
-        const keywords = escape_for_display(response.keywords);
-
-        let yes_class = (!response.is_transitional & response.is_relevant) ? 'btn-success' : 'btn-light';
-        let mr_class = (!response.is_transitional & !response.is_relevant) ? 'make_relevant_button' : '';
-        let mt_class = (!response.is_transitional & !response.is_relevant) ? 'make_relevant_button' : ''; //TODO add this to the transitional button bellow
-        let no_class = (!response.is_transitional & !response.is_relevant) ? 'btn-danger' : 'btn-light';
-        let transit_class = response.is_transitional ? 'btn-secondary' : 'btn-light';
-        let page_visited_template = `
-                <div class="row page_list_item" page_id="${page_id}">
-                    <div class="col-2 populate_time_spent" time_loaded="${time_loaded}">
-                        . . .
-                    </div>
-                    <div class="col-7 row" style="overflow: hidden; white-space: nowrap;">
-                        ${msg.doc_title}
-                    </div>
-                    <button class="col-1 btn ${yes_class} ${mr_class}"
-                            page_id="${page_id}"
-                            noun_keywords="${keywords}">
-                        ${ response.is_relevant ? '': '<span class="mytooltip">' }
-                            Yes
-                         ${ response.is_relevant ? '': '<span class="mytooltiptext">Change this page to relevant.</span> </span>' }
-                    </button>
-                    <button class="col-1 btn ${no_class}" disabled>
-                        No
-                    </button>
-                    <button class="col-1 btn ${transit_class}" disabled>
-                        Transit
-                    </button>
-                </div>
-            `
-        
-        add_pages_visited.insertAdjacentHTML(
-            "afterbegin", page_visited_template); //afterbegin prepends it, beforeend appends
-    }
 
     chrome.storage.sync.get(["session_id", "start_time", "user_id"], results => {
         if(!results || !results.session_id){
@@ -250,7 +168,13 @@ function summary_text(msg, sender, sendResponse){
                 throw new Error("Network response was not OK");
             }
         }).then( response => {
-            show_pages_results(response);
+            let add_pages_visited = document.querySelector("#add_pages_visited");
+            //TODO add the doc title into the returned fields in the server
+            response.doc_title = msg.doc_title;
+            let page_visited_row = get_page_list_element(response);
+            add_pages_visited.insertAdjacentHTML(
+                "afterbegin", page_visited_row); //afterbegin prepends it, beforeend appends
+
         }).catch( error => {
             //TODO put something on the page that says a page result failed to register
             console.log("THERE WAS AN ERROR SHOWING A PAGE!!!");

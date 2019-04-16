@@ -152,3 +152,7 @@ input[list] {
     font: 12px Arial, Helvetica, sans-serif;
     color: #666;
 }
+.no_overflow {
+     white-space: nowrap;
+     overlow: hidden;
+ }
