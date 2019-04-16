@@ -70,7 +70,9 @@ window.onload = function(){
     document.querySelector("#add_pages_visited").addEventListener("click", event => {
         let target = event.target;
         if(target.classList.contains("make_relevant_button")){
-            show_relevant_keywords(event);
+            show_relevant_keywords(target);
+        }else if(target.parentElement.classList.contains("make_relevant_button")){
+            show_relevant_keywords(target.parentElement);
         }else if(target.classList.contains("make_transitional_button")){
             make_transitional(event);
         }
@@ -181,8 +183,9 @@ function summary_text(msg, sender, sendResponse){
         }
 
         let add_pages_visited = document.querySelector("#add_pages_visited");
-        if(!!add_pages_visited.firstElementChild){
-            let time_div = add_pages_visited.firstElementChild.getElementsByClassName("populate_time_spent")[0];
+        let first_child = add_pages_visited.firstElementChild;
+        if(!!first_child && first_child.classList.contains("page_list_item")){
+            let time_div = first_child.getElementsByClassName("populate_time_spent")[0];
             let previous_time = time_div.getAttribute("time_loaded");
             let time_delta = (time_loaded - Number(previous_time))/1000;
             let time_delta_mins = Math.floor(time_delta/60);

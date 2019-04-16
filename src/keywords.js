@@ -14,9 +14,9 @@ import { escape_for_display } from "./escape_for_display.js";
  * each of which when clicked triggers an event to add them to the session.
  * disable the 'make relevant button'
  *
+ * @param the button that was pressed
  */
-export function show_relevant_keywords(event){
-    let button_pressed = event.target;
+export function show_relevant_keywords(button_pressed){
     let keywords = button_pressed.getAttribute("noun_keywords");
     //button_pressed.classList.add("isDisabled");
     let keywords_list = keywords.split("~").filter(el => el.length > 0).map(el => escape_for_display(el));
