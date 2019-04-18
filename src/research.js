@@ -195,14 +195,16 @@ function summary_text(msg, sender, sendResponse){
  */
 function stop_session_click(){
     let stop_time = new Date();
-    chrome.runtime.sendMessage({
-        "type": "stop_session",
-        "stop_time": stop_time.getTime(),
-    }, response => {
-        window.onbeforeunload = null;
-        //media.stop_recording();
-        window.location = "/html/enter_topic.html";
-        return true;
+    chrome.storage.sync.get(["session_id"], result => {
+        chrome.runtime.sendMessage({
+            "type": "stop_session",
+            "stop_time": stop_time.getTime(),
+        }, response => {
+            window.onbeforeunload = null;
+            //media.stop_recording();
+            window.location = `/html/basic_session_report.html#${result.session_id}`;
+            return true;
+        });
     });
 }
 

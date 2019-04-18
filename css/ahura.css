@@ -52,7 +52,7 @@ h3 {
     height: 100%;
     background-image: linear-gradient(to bottom left, rgba(255,255,255,0), rgba(255,255,255,1));
 }
-#stop_session, #submit_button, #user_name_submit {
+#stop_session, #submit_button, #user_name_submit, #finish_button {
     background: #33b38e;
     border-color: #33b38e;
     margin-top: 15px;

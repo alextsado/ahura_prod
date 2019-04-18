@@ -46,9 +46,24 @@ function fill_in_url_list(response){
     });
 }
 
+/*
+ * Clicking on the finish button takes the user back to entering a new session
+ */
+function go_to_entry_form(){
+        window.location = "/html/enter_topic.html";
+}
+
+/*
+ * Once the page loads register all the listeners and do the ajax calls to fill in the form
+ */
 window.onload = function(){
-    console.log("Starting script");
-    fetch(`${globals.api_url}/sessions/bb1ab2b2-6088-11e9-a23b-0291b9caeffe/basic-report/`).then( response => {
+    document.getElementById("finish_button").addEventListener("click",
+        event => go_to_entry_form());
+
+    let hash = window.location.hash.substr(1);
+    console.log(hash);
+
+    fetch(`${globals.api_url}/sessions/${hash}/basic-report/`).then( response => {
         if(response.ok){
             return response.json();
         }else{
