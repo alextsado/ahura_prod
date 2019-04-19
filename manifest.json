@@ -1,7 +1,7 @@
  {
     "name": "Ahura AI Study Sessions",
     "short_name": "Study Sessions",
-    "version": "0.2.00",
+    "version": "0.2.01",
     "author": "Ahura AI",
     "homepage_url": "https://www.ahuraai.com",
     "description": "Focus and measure your study sessions.",
@@ -19,6 +19,7 @@
     },
     "content_scripts": [{
         "matches": ["http://*/*", "https://*/*"], 
+        "run_at": "document_idle",
         "js": ["src/content.js"]
     }],
     "icons":{

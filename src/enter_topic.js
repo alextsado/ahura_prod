@@ -42,23 +42,25 @@ window.onbeforeunload = null;
 function populate_datalist(){
     let study_list = document.getElementById("study_list");
     chrome.storage.sync.get(["user_id"], result => {
-        fetch(`${globals.api_url}/users/${result.user_id}/study_suggestions/`, {
+        fetch(`${globals.api_url}/users/${result.user_id}/study-suggestions/`, {
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
             },
             method: "GET"
         }).then( response => {
             if(response.ok){
-                response.json().study_list.forEach( study_item => {
+                return response.json();
+            }else{
+                console.log("unable to display suggestions. it's just a regular input for now;");
+            }
+        }).then( response => {
+            response.study_list.forEach( study_item => {
                     let cleaned_keywords = escape_for_display(study_item.keywords);
                     let cleaned_type = escape_for_display(study_item.item_type);
                     let item_tag = `<OPTION value="${cleaned_keywords}">
                         ${cleaned_type}</OPTION>`;
                     study_list.insertAdjacentHTML("afterbegin", item_tag);
                 });
-            }else{
-                console.log("unable to display suggestions. it's just a regular input for now;");
-            }
         });
     });
 }
