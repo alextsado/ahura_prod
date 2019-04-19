@@ -6,6 +6,7 @@
  */
 "use strict";
 import { globals } from "./globals.js";
+import { escape_for_display } from "./escape_for_display.js";
 
 // ------------------------------------------
 // Routing
@@ -17,7 +18,8 @@ let user_id = null;
  * Set up event listeners
  */
 window.onload = function(){
-    document.querySelector("#submit_button").addEventListener("click",
+    populate_datalist();
+    document.querySelector("#enter_topic_form").addEventListener("submit",
         event =>  submit_button_click(event));
 
     chrome.storage.sync.get(["user_name", "user_id"], result => {
@@ -34,11 +36,38 @@ window.onload = function(){
  */
 window.onbeforeunload = null;
     
+/*
+ * Add elements to the datalist based on what the server tells us.
+ */
+function populate_datalist(){
+    let study_list = document.getElementById("study_list");
+    chrome.storage.sync.get(["user_id"], result => {
+        fetch(`${globals.api_url}/users/${result.user_id}/study_suggestions/`, {
+            headers: {
+                "Content-Type": "application/json;charset=UTF-8"
+            },
+            method: "GET"
+        }).then( response => {
+            if(response.ok){
+                response.json().study_list.forEach( study_item => {
+                    let cleaned_keywords = escape_for_display(study_item.keywords);
+                    let cleaned_type = escape_for_display(study_item.item_type);
+                    let item_tag = `<OPTION value="${cleaned_keywords}">
+                        ${cleaned_type}</OPTION>`;
+                    study_list.insertAdjacentHTML("afterbegin", item_tag);
+                });
+            }else{
+                console.log("unable to display suggestions. it's just a regular input for now;");
+            }
+        });
+    });
+}
 
 /*
  * When a user clicks the submit button to start a new session
  */
 function submit_button_click(event){
+    event.preventDefault();
     let start_time = new Date();
     //TODO remove jQuery!!!
      //var inputVideo = $("#inputVideo");
@@ -153,4 +182,5 @@ function topic_submit(msg){
             }).catch(error => alert(error));
         });
     });
+    return false;
 }

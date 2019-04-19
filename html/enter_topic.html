@@ -45,37 +45,37 @@
                             </label>
                         </div>
 
-                        <div class="row">
-                            <input name="description"
-                                   list="study_list"
-                                  id="study_description" class="form-control enter_shadow"
-                                  style="text-align: center;"
-                                  placeholder="Type subject here." ></input>
-                            <datalist id="study_list">
-                                <option value="Notre Dame, Cathedral, gothic architecture">Popular</option>
-                                <option value="How to focus during a study session">Recommended</option>
-                                <option value="Scalar vector machines">History</option>
-                                <option value="Social Media Management">&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; Course</option>
-                            </datalist>
-                        </div>
-
-
-                        <div class="row justify-content-md-center">
-                            <div id="error_content" style="width: 400; display: none; color: red;">
-                                <img src="/images/error_icon.png" height=15 />
-                                Please provide a study topic that the AI can work with.
+                        <form id="enter_topic_form">
+                            <div class="row">
+                                <input name="description"
+                                       list="study_list"
+                                       autocomplete="off"
+                                      id="study_description" class="form-control enter_shadow"
+                                      style="text-align: center;"
+                                      placeholder="Type subject here." ></input>
+                                <datalist id="study_list">
+                                </datalist>
                             </div>
-                        </div>
 
 
-
-                        <div class="row justify-content-md-center">
-                            <div class="col-4">
-                                <button id="submit_button" type="submit" class="btn btn-primary" value="submit">
-                                    Next
-                                </button>
+                            <div class="row justify-content-md-center">
+                                <div id="error_content" style="width: 400; display: none; color: red;">
+                                    <img src="/images/error_icon.png" height=15 />
+                                    Please provide a study topic that the AI can work with.
+                                </div>
                             </div>
-                        </div>
+
+
+
+                            <div class="row justify-content-md-center">
+                                <div class="col-4">
+                                    <button id="submit_button" type="submit"
+                                        class="btn btn-primary" value="submit">
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

@@ -235,6 +235,11 @@ function setup_display(){
 
         document.getElementById("populate_keywords").innerHTML = keywords_tags;
         document.getElementById("populate_description").innerText = result.description;
+
+        let relevant_topic = keywords_list[0];
+        let win = window.open(`https://google.com/search?q=${relevant_topic}`, '_blank');
+        win.focus();
+
         
         // calculate how much time is left in the session
         let start_time = new Date(result.start_time)
