@@ -156,3 +156,6 @@ input[list] {
      white-space: nowrap;
      overlow: hidden;
  }
+ .table_bold {
+     color: #777;
+ }

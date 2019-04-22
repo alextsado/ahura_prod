@@ -19,22 +19,25 @@ function convert_seconds_to_display(raw_seconds){
 function fill_in_stats(response){
     let total_session_time = convert_seconds_to_display(response.total_session_time_seconds);
     let relevant_time_sum = convert_seconds_to_display(response.relevant_time_sum_seconds);
-    let fucking_around_timw = convert_seconds_to_display(response.fucking_around_time); 
+    let fucking_around_time = convert_seconds_to_display(response.fucking_around_time); 
+    let search_time_sum = convert_seconds_to_display(response.search_time_sum_seconds);
+
+
     document.getElementById("total_session_time").innerText = total_session_time;
+    document.getElementById("total_page_count").innerText = response.total_page_count;
+
     document.getElementById("relevant_time_sum").innerText = relevant_time_sum;
     document.getElementById("relevant_time_percentage").innerText = response.relevant_time_percentage;
     document.getElementById("relevant_page_count").innerText = response.relevant_page_count;
 
-    let search_time_sum = convert_seconds_to_display(response.search_time_sum_seconds);
     document.getElementById("total_session_time").innerText = total_session_time;
     document.getElementById("search_time_sum").innerText = search_time_sum;
     document.getElementById("search_time_percentage").innerText = response.search_time_percentage;
     document.getElementById("search_page_count").innerText = response.search_page_count;
     
-    document.getElementById("total_url_count").innerText = response.total_url_count;
-    let fucking_around_html = response.fucking_around_time_percentage;
-    document.getElementById("fucking_around_time_percentage").innerText = fucking_around_html;
+    document.getElementById("fucking_around_time_percentage").innerText = response.fucking_around_time_percentage;
     document.getElementById("fucking_around_time").innerText = fucking_around_time;
+    document.getElementById("fucking_around_page_count").innerText = response.fucking_around_page_count;
 }
 
 /*
