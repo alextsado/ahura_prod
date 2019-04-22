@@ -14,8 +14,8 @@ import { globals } from "./globals.js";
 export function submit_button_click(event){
     let time_started = new Date();
     //TODO remove jQuery!!!
-     var inputVideo = $("#inputVideo");
-     inputVideo.on("play", onPlay);
+     //var inputVideo = $("#inputVideo");
+     //inputVideo.on("play", onPlay);
 
     let description = document.querySelector("[name=description]").value
     document.querySelector("#tf_canvas").style.display = "contents";

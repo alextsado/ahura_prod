@@ -4,7 +4,8 @@
  *
  * @modified by Barnaby Bienkowski
  */
-import { globals } from "../src/globals.js";
+
+import { globals }  from "../src/globals.js";
 import { get_page_list_element } from "../src/keywords.js";
 
 let forwardTimes = []
@@ -40,13 +41,13 @@ function show_away_from_computer_overlay(){
             fetch(`${globals.api_url}/pages/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json;charset=UTF-8"},
-                body: JSON.stringify({"afk_doc": true, "session_id": results.session_id}),
+                body: JSON.stringify({"afk_doc": true, "session_id": results.session_id, "load_time": new Date().getTime()}),
             }).then(()=>{
                 let add_pages_visited = document.querySelector("#add_pages_visited");
                 let page_visited_row = get_page_list_element({
                     "is_transitional": false,
                     "is_relevant": false,
-                    "doc_title": "Away from computer";
+                    "doc_title": "Away from computer",
                     "page_id": "",
                     "keywords": "",
                 });
@@ -74,7 +75,7 @@ function trigger_at_computer(){
 }
 
 
-async function onPlay() {
+export async function onPlay() {
   const videoEl = document.getElementById('inputVideo');
 
   if(videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded()){

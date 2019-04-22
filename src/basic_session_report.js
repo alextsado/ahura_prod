@@ -30,8 +30,8 @@ function fill_in_stats(response){
     document.getElementById("search_time_percentage").innerText = response.search_time_percentage;
     document.getElementById("search_page_count").innerText = response.search_page_count;
     
-    document.getElementById("total_url_count").innerText = total_url_count;
-    let fucking_around_html = "<blink>" + fucking_around_time_percentage + "</blink>";
+    document.getElementById("total_url_count").innerText = response.total_url_count;
+    let fucking_around_html = response.fucking_around_time_percentage;
     document.getElementById("fucking_around_time_percentage").innerText = fucking_around_html;
 }
 

@@ -10,6 +10,7 @@ import { show_relevant_keywords, keyword_click, keyword_cancel_click, get_page_l
 import { escape_for_display } from "./escape_for_display.js";
 import { make_transitional } from "./transitional.js";
 import { globals } from "./globals.js";
+import { onPlay } from "../tf/inlineScript.js";
 
 // ------------------------------------------
 // Routing
