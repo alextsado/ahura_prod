@@ -4,6 +4,9 @@
  *
  * @modified by Barnaby Bienkowski
  */
+import { globals } from "../src/globals.js";
+import { get_page_list_element } from "../src/keywords.js";
+
 let forwardTimes = []
 let withBoxes = true
 
@@ -31,6 +34,28 @@ function show_away_from_computer_overlay(){
 
     document.getElementById("overlay_bg").style.display = "block";
     document.getElementById("away_from_computer_overlay_content").style.display = "block";
+    //TODO send a message to the server after 5 seconds unless somebody clicks that they're back
+    globals.afk_counter = setTimeout(function(){
+        chrome.storage.sync.get(["session_id"], results => {
+            fetch(`${globals.api_url}/pages/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json;charset=UTF-8"},
+                body: JSON.stringify({"afk_doc": true, "session_id": results.session_id}),
+            }).then(()=>{
+                let add_pages_visited = document.querySelector("#add_pages_visited");
+                let page_visited_row = get_page_list_element({
+                    "is_transitional": false,
+                    "is_relevant": false,
+                    "doc_title": "Away from computer";
+                    "page_id": "",
+                    "keywords": "",
+                });
+                add_pages_visited.insertAdjacentHTML(
+                    "afterbegin", page_visited_row);
+            });
+            //TODO display an AFK segment in the URL history
+        });
+    });
 }
 
 function trigger_away_from_computer(){

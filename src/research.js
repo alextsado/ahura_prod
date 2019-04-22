@@ -106,6 +106,8 @@ function hide_relevant_overlay(){
  * Hide the overlay that was telling the user that we think they've stepped away from the computer.
  */
 function hide_away_overlay(){
+    clearTimeout(globals.afk_counter);
+    globals.afk_counter = null;
     document.getElementById("overlay_bg").style.display = "none";
     document.getElementById("away_from_computer_overlay_content").style.display = "none";
 }

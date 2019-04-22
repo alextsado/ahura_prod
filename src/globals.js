@@ -6,6 +6,8 @@ export let globals = {
 
     distraction_counter: 0,
 
+    afk_counter: null,
+
     distraction_threshold: 3,
 
     is_ongoing_session: false,

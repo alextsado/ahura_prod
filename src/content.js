@@ -13,7 +13,26 @@ let load_time = new Date();
 function scan_page(){
     chrome.storage.sync.get(["session_id"], results => {
         if(!!results && !!results.session_id){
-            ahura_go(results);
+            let doc_hash = document.location.hash;
+            let doc_loc = doc_hash.substr(1) ? !!doc_hash : null;
+            if(!!doc_loc && !!document.getElementById(doc_loc)){
+                scan_with_hash(results, doc_loc);
+            }else{
+                scan_no_hash(results);
+            }
+        }
+    });
+}
+
+
+/*
+ * Whenever the URL hash changes rescan the page to include the new hash
+ */
+window.onHashchange = function(){
+    chrome.storage.sync.get(["session_id"], results => {
+        if(!!results && !!results.session_id){
+            load_time = new Date();
+            scan_page();
         }
     });
 }
@@ -37,10 +56,31 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 scan_page();
 
 /*
+ * Collect the first couple hundred characters of text after
+ * a hash matching the page URL to be analyzed for relevance.
+ */
+function scan_with_hash(results, doc_loc){
+    let content_start, doc_body, first_500, doc_title;
+    doc_body = document.querySelector("body").innerText ? !!document.querySelector("body") : "";
+    doc_title = document.title ? !!document.title : "";
+    content_start = doc_body.indexOf(document.getElementById(doc_loc).innerText);
+    first_500 = doc_body.substr(content_start, content_start + 700);
+
+    chrome.runtime.sendMessage({
+        type: "summary_text",
+        doc_title: doc_title,
+        session_id: results.session_id,
+        message: first_500,
+        load_time: load_time.getTime()
+    });
+}
+
+
+/*
  * Collect the first couple hundred characters of text to be
  * analyzed for relevance
  */
-function ahura_go(results){
+function scan_no_hash(results){
     let content_start, first_h1, first_h2, doc_body, first_500, doc_title;
     if(!!document.querySelector("h1")){
         first_h1 = document.querySelector("h1").innerText;
@@ -50,7 +90,7 @@ function ahura_go(results){
     }
     if(!!document.querySelector("body")){
         doc_body = document.querySelector("body").innerText;
-    }
+    }//TODO else do nothing??/
 
     if(!!document.title){
         doc_title = document.title;
