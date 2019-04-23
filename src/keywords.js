@@ -7,6 +7,7 @@
  */
 
 import { globals } from "./globals.js";
+import { show_distracted_overlay } from "./research.js";
 import { escape_for_display } from "./escape_for_display.js";
 
 /*

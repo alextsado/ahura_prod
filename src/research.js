@@ -51,7 +51,7 @@ window.onload = function(){
             event => hide_relevant_overlay(event));
 
     document.getElementById("close_away_overlay_button").addEventListener("click",
-        event => hide_away_overlay(event));
+        event => { hide_away_overlay(event); request_return_verification()});
 
     document.getElementById("close_distraction_overlay_button").addEventListener("click",
         event => get_back_to_studying(event));
@@ -155,10 +155,14 @@ function hide_away_overlay(){
     globals.afk_counter = null;
     document.getElementById("overlay_bg").style.display = "none";
     document.getElementById("away_from_computer_overlay_content").style.display = "none";
+}
 
+function request_return_verification(){
     let afk_request_return_verification = new Event("afk_request_return_verification");
     document.dispatchEvent(afk_request_return_verification);
 }
+
+
 /**
  * Hide the overlay that was telling the user that we think they're distracted.
  */
@@ -202,7 +206,6 @@ function summary_text(msg, sender, sendResponse){
         "tab_id": sender.tab.id
     }
 
-
     chrome.storage.sync.get(["session_id", "start_time", "user_id"], results => {
         if(!results || !results.session_id){
             throw new Exception("There is no session ID but we called STOP on it");
@@ -231,6 +234,7 @@ function summary_text(msg, sender, sendResponse){
             console.log("THERE WAS AN ERROR SHOWING A PAGE!!!");
         });
     });
+    hide_away_overlay();
     return true;
 }
 
