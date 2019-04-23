@@ -10,7 +10,6 @@ import { show_relevant_keywords, keyword_click, keyword_cancel_click, get_page_l
 import { escape_for_display } from "./escape_for_display.js";
 import { make_transitional } from "./transitional.js";
 import { globals } from "./globals.js";
-import { onPlay } from "../tf/inlineScript.js";
 
 // ------------------------------------------
 // Routing
@@ -21,6 +20,7 @@ let description;
 let start_time;
 let user_id;
 let session_timer;
+let last_active_tab;
 
 /*
  * Route any messages relevant to the functionality of the window
@@ -40,6 +40,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
  */
 window.onload = function(){
     setup_display();
+
+    document.addEventListener("afk_event", show_away_from_computer_overlay);
+    document.addEventListener("afk_return_verification", afk_return_verification);
 
     document.getElementById("make_relevant_overlay_link").addEventListener("click",
         event => hide_distracted_overlay(event));
@@ -86,6 +89,47 @@ window.onbeforeunload = function(){
     return "Closing this window will end your study session";
 }
 
+function afk_return_verification(){
+    console.log("received return verification");
+    chrome.tabs.sendMessage(last_active_tab, {
+       "type": "rescan"
+   });
+}
+
+
+function show_away_from_computer_overlay(){
+    console.log("show away from computer overlay called in research.js");
+   chrome.runtime.sendMessage({
+        "type": "open_window"
+    });
+
+    document.getElementById("overlay_bg").style.display = "block";
+    document.getElementById("away_from_computer_overlay_content").style.display = "block";
+    //TODO send a message to the server after 5 seconds unless somebody clicks that they're back
+    globals.afk_counter = setTimeout(function(){
+        chrome.storage.sync.get(["session_id"], results => {
+            fetch(`${globals.api_url}/pages/`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json;charset=UTF-8"},
+                body: JSON.stringify({"afk_doc": true, "session_id": results.session_id, "load_time": new Date().getTime()}),
+            }).then(()=>{
+                let add_pages_visited = document.querySelector("#add_pages_visited");
+                let page_visited_row = get_page_list_element({
+                    "is_transitional": false,
+                    "is_relevant": false,
+                    "doc_title": "Away from computer",
+                    "page_id": "",
+                    "keywords": "",
+                });
+                add_pages_visited.insertAdjacentHTML(
+                    "afterbegin", page_visited_row);
+            });
+            //TODO display an AFK segment in the URL history
+        });
+    });
+}
+
+
 /**
  * Show an overlay to tell the user that we think they're distracted.
  */
@@ -111,6 +155,9 @@ function hide_away_overlay(){
     globals.afk_counter = null;
     document.getElementById("overlay_bg").style.display = "none";
     document.getElementById("away_from_computer_overlay_content").style.display = "none";
+
+    let afk_request_return_verification = new Event("afk_request_return_verification");
+    document.dispatchEvent(afk_request_return_verification);
 }
 /**
  * Hide the overlay that was telling the user that we think they're distracted.
@@ -145,6 +192,7 @@ function get_back_to_studying(event){
  * Handle a summary text  message from the content page
  */
 function summary_text(msg, sender, sendResponse){
+    last_active_tab = sender.tab.id;
     let pkg = {
         "doc_title": msg.doc_title,
         "url": sender.url,
@@ -218,16 +266,15 @@ function stop_session_click(){
  *
  */
 function setup_display(){
-    var inputVideo = document.getElementById("inputVideo");
-    inputVideo.addEventListener("play", onPlay);
-
     chrome.storage.sync.get(["session_id", "start_time", "user_name", "user_id", "description", "keywords"], result => {
         //Check that everything is OK
         if(!result || !result.session_id || !result.user_name){
            console.error("THERE WAS SOMETHING WRONG WITH SAVING THE SESSION"); 
         }
         
-        let keywords_list = result.keywords.split("~").filter(el => el.length > 0).map(el => escape_for_display(el));
+        let keywords_list = result.keywords.split("~")
+            .filter(el => el.length > 0)
+            .map(el => escape_for_display(el));
         let keywords_tags = `
                 ${keywords_list.map( keyword => ` 
                     <div class="col-4 keyword_list_item">
@@ -258,6 +305,8 @@ function setup_display(){
         }
         
         //Update the clock every second using the above calculations
-        setInterval(function(){document.getElementById("populate_countdown_clock").innerText = get_timer();}, 1000)
+        setInterval(function(){
+            document.getElementById("populate_countdown_clock").innerText = get_timer();
+        }, 1000)
     });
 }

@@ -5,11 +5,9 @@
  * @modified by Barnaby Bienkowski
  */
 
-import { globals }  from "../src/globals.js";
-import { get_page_list_element } from "../src/keywords.js";
-
 let forwardTimes = []
 let withBoxes = true
+let afk_request_return_verification = false;
 
 
 function updateTimeStats(timeInMs) {
@@ -19,6 +17,7 @@ function updateTimeStats(timeInMs) {
 
 function howDoIFeel(apiResult) {
   let answer = {expression: "foo", probability: 0}
+    console.log(apiResult.expressions);
   for (feeling in apiResult.expressions) {
 	if (apiResult.expressions[feeling].probability > answer.probability) {
 	  answer = apiResult.expressions[feeling]
@@ -29,34 +28,8 @@ function howDoIFeel(apiResult) {
 let away_from_computer_counter = null;
 
 function show_away_from_computer_overlay(){
-   chrome.runtime.sendMessage({
-        "type": "open_window"
-    });
-
-    document.getElementById("overlay_bg").style.display = "block";
-    document.getElementById("away_from_computer_overlay_content").style.display = "block";
-    //TODO send a message to the server after 5 seconds unless somebody clicks that they're back
-    globals.afk_counter = setTimeout(function(){
-        chrome.storage.sync.get(["session_id"], results => {
-            fetch(`${globals.api_url}/pages/`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json;charset=UTF-8"},
-                body: JSON.stringify({"afk_doc": true, "session_id": results.session_id, "load_time": new Date().getTime()}),
-            }).then(()=>{
-                let add_pages_visited = document.querySelector("#add_pages_visited");
-                let page_visited_row = get_page_list_element({
-                    "is_transitional": false,
-                    "is_relevant": false,
-                    "doc_title": "Away from computer",
-                    "page_id": "",
-                    "keywords": "",
-                });
-                add_pages_visited.insertAdjacentHTML(
-                    "afterbegin", page_visited_row);
-            });
-            //TODO display an AFK segment in the URL history
-        });
-    });
+    let afk_event = new Event("afk_event");
+    document.dispatchEvent(afk_event);
 }
 
 function trigger_away_from_computer(){
@@ -72,10 +45,16 @@ function trigger_at_computer(){
         clearTimeout(away_from_computer_counter);
         away_from_computer_counter = null;
     }
+    if(afk_request_return_verification){
+        console.log("send an event to rescan");
+        let afk_return_verification = new Event("afk_return_verification");
+        document.dispatchEvent(afk_return_verification);
+        afk_request_return_verification = false;
+    }
 }
 
 
-export async function onPlay() {
+async function onPlay() {
   const videoEl = document.getElementById('inputVideo');
 
   if(videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded()){
@@ -86,31 +65,24 @@ export async function onPlay() {
   const options = getFaceDetectorOptions()
 
   const ts = Date.now()
-    let result, result1;
-
-    try{
-      result = await faceapi.detectSingleFace(videoEl, options).withFaceLandmarks()
-      result1 = await faceapi.detectSingleFace(videoEl, options).withFaceExpressions()
-    }catch(e){
-        //const result = null;
-        //const result1 =null;
-    }
-  
+    let result;
   try {
-    howDoIFeel(result1)["expression"];
-	document.getElementById("emotion_display").innerText = "User detected.";
-    trigger_at_computer();
-	//document.getElementById("emotion_display").innerText = howDoIFeel(result1)["expression"];
-  }
-  catch(err) {
-	document.getElementById("emotion_display").innerText = "No user detected.";
-    trigger_away_from_computer();
-	console.log(err)
+      result = await faceapi.detectSingleFace(videoEl, options).withFaceLandmarks()
+      if(!!result){
+          document.getElementById("emotion_display").innerText = "User detected.";
+          trigger_at_computer();
+      }else{
+          document.getElementById("emotion_display").innerText = "No user detected.";
+          trigger_away_from_computer();
+      }
+  }catch(err) {
+      document.getElementById("emotion_display").innerText = "No user detected.";
+      //trigger_away_from_computer();
   }
 
   updateTimeStats(Date.now() - ts)
 
-  if(!!result && !!result1) {
+  if(!!result) {
 	drawLandmarks(videoEl, document.getElementById('overlay'), [result], withBoxes)
   }
 
@@ -128,11 +100,18 @@ async function run() {
   // to the video element
   const stream = await navigator.mediaDevices.getUserMedia({ video: {} })
   const videoEl = document.getElementById('inputVideo');
-  videoEl.srcObject = stream
+  videoEl.srcObject = stream;
+
+    var inputVideo = document.getElementById("inputVideo");
+    inputVideo.addEventListener("play", onPlay);
 }
 
 function updateResults() {}
 
 document.addEventListener("DOMContentLoaded", function(event) { 
-  run()
+    run();
+    document.addEventListener("afk_request_return_verification", e =>{
+        console.log("setting request for verification to true");
+        afk_request_return_verification = true
+    });
 });

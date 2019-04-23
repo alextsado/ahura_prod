@@ -44,7 +44,6 @@ window.onHashchange = function(){
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     console.log("message received");
     if(msg.type === "rescan"){
-        console.log("rescanning");
         scan_page();
     }
 });
