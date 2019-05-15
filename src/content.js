@@ -11,7 +11,7 @@ let load_time = new Date();
  * a pomodoro study session right now 
  */
 function scan_page(){
-    chrome.storage.sync.get(["session_id"], results => {
+    chrome.storage.local.get(["session_id"], results => {
         if(!!results && !!results.session_id){
             let doc_hash = document.location.hash;
             let doc_loc = doc_hash.substr(1) ? !!doc_hash : null;
@@ -29,7 +29,7 @@ function scan_page(){
  * Whenever the URL hash changes rescan the page to include the new hash
  */
 window.onHashchange = function(){
-    chrome.storage.sync.get(["session_id"], results => {
+    chrome.storage.local.get(["session_id"], results => {
         if(!!results && !!results.session_id){
             load_time = new Date();
             scan_page();

@@ -48,7 +48,7 @@ function set_user_name_get_user_id(user_name){
             }
         }).then( response => {
             console.log("response is ", response);
-            chrome.storage.sync.set({
+            chrome.storage.local.set({
                 "user_name": user_name,
                 "user_id": response.user_id
             });

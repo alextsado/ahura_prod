@@ -107,7 +107,7 @@ function show_away_from_computer_overlay(){
     document.getElementById("away_from_computer_overlay_content").style.display = "block";
     //TODO send a message to the server after 5 seconds unless somebody clicks that they're back
     globals.afk_counter = setTimeout(function(){
-        chrome.storage.sync.get(["session_id"], results => {
+        chrome.storage.local.get(["session_id"], results => {
             fetch(`${globals.api_url}/pages/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json;charset=UTF-8"},
@@ -179,7 +179,7 @@ function get_back_to_studying(event){
     console.log("closing the overlay and taking away one distraction point");
     hide_distracted_overlay();
     globals.distraction_counter--;
-    chrome.storage.sync.get("keywords", results => {
+    chrome.storage.local.get("keywords", results => {
         let keywords_list = results.keywords.split("~").filter(el => el.length > 0);
         let relevant_topic = keywords_list[0];
         let win = window.open(`https://google.com/search?q=${relevant_topic}`, '_blank');
@@ -206,7 +206,7 @@ function summary_text(msg, sender, sendResponse){
         "tab_id": sender.tab.id
     }
 
-    chrome.storage.sync.get(["session_id", "start_time", "user_id"], results => {
+    chrome.storage.local.get(["session_id", "start_time", "user_id"], results => {
         if(!results || !results.session_id){
             throw new Exception("There is no session ID but we called STOP on it");
         }
@@ -250,7 +250,7 @@ function summary_text(msg, sender, sendResponse){
  */
 function stop_session_click(){
     let stop_time = new Date();
-    chrome.storage.sync.get(["session_id"], result => {
+    chrome.storage.local.get(["session_id"], result => {
         chrome.runtime.sendMessage({
             "type": "stop_session",
             "stop_time": stop_time.getTime(),
@@ -270,7 +270,7 @@ function stop_session_click(){
  *
  */
 function setup_display(){
-    chrome.storage.sync.get(["session_id", "start_time", "user_name", "user_id", "description", "keywords"], result => {
+    chrome.storage.local.get(["session_id", "start_time", "user_name", "user_id", "description", "keywords"], result => {
         //Check that everything is OK
         if(!result || !result.session_id || !result.user_name){
            console.error("THERE WAS SOMETHING WRONG WITH SAVING THE SESSION"); 

@@ -32,10 +32,10 @@ let user_id, user_name = null;
 
 let chat_window = null;  // The chat window. Its presence indicates that there is a sessison ongoing. Once it is closed then a listener ends the sessison on the DB. TODO also close the session when the browser is closed, and when the computer gets put to sleep or crashes.
 
-//chrome.storage.sync.remove('user_id', function(result){ console.log("removed user_id"); }); //only uncomment this line debugging if you have reset the DB.
+//chrome.storage.local.remove('user_id', function(result){ console.log("removed user_id"); }); //only uncomment this line debugging if you have reset the DB.
 
 
-chrome.storage.sync.get(['user_id', 'user_name'], result => {
+chrome.storage.local.get(['user_id', 'user_name'], result => {
     if(!!result && !!result.user_id && result.user_id.length >= 1 && !!result.user_name && result.user_name.length >= 1){
         user_id = result.user_id;
         user_name = result.user_name;
@@ -63,13 +63,13 @@ function get_todays_alarm_time(){
         }
 
         let cur_day = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date().getDay()]  
-        chrome.storage.sync.get(['alarm_times', "user_id"], result => {
+        chrome.storage.local.get(['alarm_times', "user_id"], result => {
             if(!!result.alarm_times){
                 resolve(result.alarm_times[cur_day])
             }else{
                 fetch(`${globals.api_url}/users/${result.user_id}/goals/`).then( get_response => {
                     if(!!response.ok && !!response.json()){
-                        chrome.storage.sync.set({"alarm_times": get_response.json()});
+                        chrome.storage.local.set({"alarm_times": get_response.json()});
                         resolve(default_alarm_times[cur_day]);
                     }else{
                         fetch(`${globals.api_url}/users/${result.user_id}/goals/`,{
@@ -83,7 +83,7 @@ function get_todays_alarm_time(){
                             if(!response.ok){
                                 console.log("for some reason the server did not save the default goal settings");
                             }
-                            chrome.storage.sync.set({"alarm_times": default_alarm_times});
+                            chrome.storage.local.set({"alarm_times": default_alarm_times});
                             resolve(default_alarm_times[cur_day]);
                         });
                     }
@@ -137,7 +137,7 @@ function open_window(){
         }
     }
     if(!chat_window){
-        chrome.storage.sync.get(["user_id"], results => {
+        chrome.storage.local.get(["user_id"], results => {
             let open_url;// = "research.html";
             if(!!results && !!results.user_id){
                 open_url = "/html/enter_topic.html";
@@ -162,7 +162,7 @@ chrome.windows.onRemoved.addListener(window_id => {
     if(!!chat_window && window_id === chat_window.id){
         chat_window = null;
     }
-    chrome.storage.sync.get(["session_id"], results => {
+    chrome.storage.local.get(["session_id"], results => {
         if(!!results && !!results.session_id){
             let stop_time = new Date().getTime();
             stop_session({"stop_time": stop_time});
@@ -187,7 +187,7 @@ function stop_session(msg, sender, sendResponse){
     }
 
 
-    chrome.storage.sync.get(["session_id", "start_time", "user_id"], results => {
+    chrome.storage.local.get(["session_id", "start_time", "user_id"], results => {
         if(!results || !results.session_id){
             console.error("There is no session ID but we called STOP on it");
         }
@@ -204,7 +204,7 @@ function stop_session(msg, sender, sendResponse){
         }).then(function(response){
             if(response.status <= 299){
                 //media.stop_recording();
-                chrome.storage.sync.set({
+                chrome.storage.local.set({
                     "session_id": null,
                     "start_time": null
                 });

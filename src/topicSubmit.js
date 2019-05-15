@@ -82,7 +82,7 @@ function topic_submit(msg){
     console.log("msg is");
     console.log(msg);
     return new Promise((resolve, reject) => {
-        chrome.storage.sync.get("user_id", results => {
+        chrome.storage.local.get("user_id", results => {
             if(!results || !results.user_id || results.user_id.length <= 0){
                 throw new Exception("There was no user id stored in this app.");
             }
@@ -106,7 +106,7 @@ function topic_submit(msg){
                 }
             }).then(response => {
 
-                chrome.storage.sync.set({
+                chrome.storage.local.set({
                     "session_id": response.session_id,
                     "description": msg.description,
                     "keywords": response.keywords}, result => {

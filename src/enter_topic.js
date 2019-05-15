@@ -22,7 +22,7 @@ window.onload = function(){
     document.querySelector("#enter_topic_form").addEventListener("submit",
         event =>  submit_button_click(event));
 
-    chrome.storage.sync.get(["user_name", "user_id"], result => {
+    chrome.storage.local.get(["user_name", "user_id"], result => {
         //TODO if user_name or user_id are null then go back to the enter-username page
         user_name = result.user_name;
         user_id = result.user_id;
@@ -41,7 +41,7 @@ window.onbeforeunload = null;
  */
 function populate_datalist(){
     let study_list = document.getElementById("study_list");
-    chrome.storage.sync.get(["user_id"], result => {
+    chrome.storage.local.get(["user_id"], result => {
         fetch(`${globals.api_url}/users/${result.user_id}/study-suggestions/`, {
             headers: {
                 "Content-Type": "application/json;charset=UTF-8"
@@ -146,7 +146,7 @@ function create_topic_submission_spinner(){
  */
 function topic_submit(msg){
     return new Promise((resolve, reject) => {
-        chrome.storage.sync.get("user_id", results => {
+        chrome.storage.local.get("user_id", results => {
             if(!results || !results.user_id || results.user_id.length <= 0){
                 throw new Exception("There was no user id stored in this app.");
             }
@@ -177,7 +177,7 @@ function topic_submit(msg){
                     let rem_me = document.getElementById("topic_submission_spinner");
                     rem_me.parentElement.removeChild(rem_me);
                 }else{
-                    chrome.storage.sync.set({
+                    chrome.storage.local.set({
                         "session_id": response.session_id,
                         "start_time": msg.start_time,
                         "description": msg.description,
