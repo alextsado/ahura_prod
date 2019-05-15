@@ -11,7 +11,6 @@ import { globals } from "./globals.js";
 
 /*
  * Route messages from other parts of the app accordingly.
- * TODO move "topic_submit" out of messages, and just let the window handle it
  */
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     //Stop the session
@@ -30,7 +29,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
  * Get the browser ID and users name
  */
 let user_id, user_name = null;
-let chat_window = null;
+
+let chat_window = null;  // The chat window. Its presence indicates that there is a sessison ongoing. Once it is closed then a listener ends the sessison on the DB. TODO also close the session when the browser is closed, and when the computer gets put to sleep or crashes.
+
 //chrome.storage.sync.remove('user_id', function(result){ console.log("removed user_id"); }); //only uncomment this line debugging if you have reset the DB.
 
 
@@ -42,6 +43,72 @@ chrome.storage.sync.get(['user_id', 'user_name'], result => {
         open_window();
     }
 });
+
+
+/*
+ * Determine the day of the week, and get todays alarm time
+ */
+function get_todays_alarm_time(){
+    return new Promise((resolve, reject) => {
+        //If there is no schedule set, then set it to 3:00 every day
+        let default_alarm_times = {
+            "last_synched": new Date(),
+            "monday": "15:00:00",
+            "tuesday": "15:00:00",
+            "wednesday": "15:00:00",
+            "thursday": "15:00:00",
+            "friday": "15:00:00",
+            "saturday": "",
+            "sunday": ""
+        }
+
+        let cur_day = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date().getDay()]  
+        chrome.storage.sync.get(['alarm_times', "user_id"], result => {
+            if(!!result.alarm_times){
+                resolve(result.alarm_times[cur_day])
+            }else{
+                fetch(`${globals.api_url}/users/${result.user_id}/goals/`).then( get_response => {
+                    if(!!response.ok && !!response.json()){
+                        chrome.storage.sync.set({"alarm_times": get_response.json()});
+                        resolve(default_alarm_times[cur_day]);
+                    }else{
+                        fetch(`${globals.api_url}/users/${result.user_id}/goals/`,{
+                            headers: {
+                                "Content-Type": "application/json;charset=UTF-8"
+                            },
+                            credentials: "same-origin",
+                            method: "POST",
+                            body: JSON.stringify(default_alarm_times)
+                        }).then( response => {
+                            if(!response.ok){
+                                console.log("for some reason the server did not save the default goal settings");
+                            }
+                            chrome.storage.sync.set({"alarm_times": default_alarm_times});
+                            resolve(default_alarm_times[cur_day]);
+                        });
+                    }
+                });
+            }
+        });
+    });
+}
+
+
+//Create an alarm called study_time that runs every 15 minutes.
+chrome.alarms.create("study_time", {periodInMinutes: 15});
+//When study_time alarm is called then check if it's the users' daily study time. 
+//If it is then open up the window
+chrome.alarms.onAlarm.addListener( alarm => {
+    if(alarm.name === "study_time"){
+        //TODO if the alarm time in the database is equal to or greater than the alarm time.
+            //TODO which day of the week is it, what time is our alarm supposed to be today?
+            //TODO then if there isn't an ongoing session, or todays total session time is greater than the goal,
+            //TODO then open up the app window
+            }
+        });
+    }
+});
+    
 
 chrome.tabs.onActivated.addListener(activateInfo => {
     chrome.tabs.sendMessage(activateInfo.tabId, {

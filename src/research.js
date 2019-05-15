@@ -133,7 +133,7 @@ function show_away_from_computer_overlay(){
 /**
  * Show an overlay to tell the user that we think they're distracted.
  */
-function show_distracted_overlay(){
+export function show_distracted_overlay(){
     document.getElementById("overlay_bg").style.display = "block";
     document.getElementById("distracted_overlay_content").style.display = "block";
 }

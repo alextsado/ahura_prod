@@ -54,13 +54,17 @@ function populate_datalist(){
                 console.log("unable to display suggestions. it's just a regular input for now;");
             }
         }).then( response => {
-            response.study_list.forEach( study_item => {
-                    let cleaned_keywords = escape_for_display(study_item.keywords);
-                    let cleaned_type = escape_for_display(study_item.item_type);
-                    let item_tag = `<OPTION value="${cleaned_keywords}">
-                        ${cleaned_type}</OPTION>`;
-                    study_list.insertAdjacentHTML("afterbegin", item_tag);
-                });
+            if(!!response && !!response.study_list){
+                response.study_list.forEach( study_item => {
+                        let cleaned_keywords = escape_for_display(study_item.keywords);
+                        let cleaned_type = escape_for_display(study_item.item_type);
+                        let item_tag = `<OPTION value="${cleaned_keywords}">
+                            ${cleaned_type}</OPTION>`;
+                        study_list.insertAdjacentHTML("afterbegin", item_tag);
+                    });
+            }else{
+                console.log("Response did not have a study list");
+            }
         });
     });
 }

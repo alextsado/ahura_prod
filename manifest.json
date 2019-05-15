@@ -12,6 +12,7 @@
      },
     "permissions": [
             "storage",
+            "alarm",
             "https://devapi.spentaai.com/*/*"
     ],
     "background": {
