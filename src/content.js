@@ -11,16 +11,28 @@ let load_time = new Date();
  * a pomodoro study session right now 
  */
 function scan_page(){
-    chrome.storage.local.get(["session_id"], results => {
+    chrome.storage.local.get(["session_id", "trigger_words"], results => {
         if(!!results && !!results.session_id){
-            let doc_hash = document.location.hash;
-            let doc_loc = doc_hash.substr(1) ? !!doc_hash : null;
+            const doc_hash = document.location.hash;
+            const doc_loc = doc_hash.substr(1) ? !!doc_hash : null;
             if(!!doc_loc && !!document.getElementById(doc_loc)){
                 scan_with_hash(results, doc_loc);
             }else{
                 scan_no_hash(results);
             }
-        }
+        }//TODO if there is no session, then check whether the page title contains a trigger word and send a signal prompting the user to start a study session
+        //}else{
+        //    const doc_title = document.title ? !!document.title : "";
+        //    let first_h1, first_h2 = "";
+        //    if(!!document.querySelector("h1")){
+        //        first_h1 = document.querySelector("h1").innerText;
+        //    }
+        //    if(!!document.querySelector("h2")){
+        //        first_h2 = document.querySelector("h2").innerText;
+        //    }
+        //    TODO for every trigger word check whether it exists in doc_title, first_h2, or first_h1. If so then send a trigger to give the user an option to start a session.
+        //    results.trigger_words.split(",").some(item => {return doc_title.indexOf(item.trim()) >= 0 || first_h1.indexOf(item.trim()) >= 0 || first_h2.indexOf(item.trim()) >= 0});
+        //    chrome.runtime.sendMessage({...
     });
 }
 
