@@ -95,7 +95,7 @@ export function user_met_goal_today(){
             && result.studied_today.last_updated.getMonth() === cur_day.getMonth() &&
             result.studied_today.last_updated.getYear() === cur_day.getMonth()){
             //TODO then if the time_studied_today greater than alarm_times.duration
-            if(result.studied_today.time_studied >== result.alarm_times.duration){
+            if(result.studied_today.time_studied >= result.alarm_times.duration){
                 return true;
             }
         }
@@ -132,10 +132,10 @@ export function update_time_studied(seconds_studied, override = false){
             if(is_today(result.studied_today.last_updated)){
                 const cur_time = new Date();
                 let new_studied_time = result.studied_today.time_studied + seconds_studied;
-                const updated_studied_today = {"last_updated": cur_time, time_studied = new_studied_time}
+                const updated_studied_today = {"last_updated": cur_time, "time_studied": new_studied_time};
                 chrome.storage.local.set({"studied_today": updated_studied_today}) 
             }else{ //It's not from today, so start from zero
-                const updated_studied_today = {"last_updated": cur_time, time_studied: seconds_studied}
+                const updated_studied_today = {"last_updated": cur_time, "time_studied": seconds_studied}
                 chrome.storage.local.set({"studied_today": updated_studied_today}) 
             }
         });

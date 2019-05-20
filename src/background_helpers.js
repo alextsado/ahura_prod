@@ -7,11 +7,16 @@
  * @Since May 15, 2019
  */
 
+"use strict";
+import { globals } from "./globals.js";
 
 /*
  * Bring the window to the forefront, or open it up if it isn't already.
+ *
+ * @param the current chat window
+ * @param a callback that does something with the chat window
  */
-export function open_window(chat_window){
+export function open_window(chat_window, callback){
     if(!!chat_window){
         try{
             chrome.windows.update(chat_window.id, {"focused": true });  
@@ -35,7 +40,8 @@ export function open_window(chat_window){
                 "width": 1020,
                 "height": 600
             }, win => {
-                chat_window = win;
+                callback(win);
+                //chat_window = win;
             });
         });
     }

@@ -14,9 +14,8 @@
  */
 
 "use strict";
-import { globals } from "./globals.js";
 import { get_todays_alarm_time, is_past_time, user_met_goal_today } from "./alarm_helper.js";
-import { open_window, stop_session ) from "./background_helpers.js";
+import { open_window, stop_session } from "./background_helpers.js";
 
 //chrome.storage.local.remove('user_id', function(result){ console.log("removed user_id"); }); //only uncomment this line debugging if you have reset the DB.
 
@@ -32,7 +31,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return stop_session(msg, sender, sendResponse);
     }
     if(msg.type === "open_window"){
-        open_window(chat_window);
+        open_window(chat_window, win => chat_window = win);
     }
     return true;
 });
@@ -43,11 +42,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
  * If not then open a window so that users can get started
  */
 chrome.storage.local.get(['user_id', 'user_name'], result => {
-    if(!!result && !!result.user_id && result.user_id.length >= 1 && !!result.user_name && result.user_name.length >= 1){
-        user_id = result.user_id;
-        user_name = result.user_name;
+    if(!!result && !!result.user_id &&
+        result.user_id.length >= 1 &&
+        !!result.user_name && result.user_name.length >= 1){
+        console.log(`starting app with user ${result.user_name}, id: ${result.user_id}`);
     }else{
-        open_window(chat_window);
+        open_window(chat_window, win => chat_window = win);
     }
 });
 
@@ -66,7 +66,7 @@ chrome.alarms.onAlarm.addListener( alarm => {
             if(is_past_time(alarm_time) && !!chat_window){
                 user_met_goal_today().then( met_goal => {
                     if(!met_goal){
-                        open_window(chat_window); //TODO optionally add a message for display on the window
+                        open_window(chat_window, win => chat_window = win); //TODO optionally add a message for display on the window
                     }
                 });
             }
@@ -88,7 +88,7 @@ chrome.tabs.onActivated.addListener(activateInfo => {
  * When a user clicks the icon then open a new window
  */
 chrome.browserAction.onClicked.addListener(function(tab) {
-    open_window(chat_window);
+    open_window(chat_window, win => chat_window = win);
 });
 
 /*
