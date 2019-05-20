@@ -84,3 +84,4 @@ export function stop_session(msg, sender, sendResponse){
         });
     });
 }
+

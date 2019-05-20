@@ -15,7 +15,7 @@
 
 "use strict";
 import { globals } from "./globals.js";
-import { get_todays_alarm_time, is_past_time } from "./alarm_helper.js";
+import { get_todays_alarm_time, is_past_time, user_met_goal_today } from "./alarm_helper.js";
 import { open_window, stop_session ) from "./background_helpers.js";
 
 //chrome.storage.local.remove('user_id', function(result){ console.log("removed user_id"); }); //only uncomment this line debugging if you have reset the DB.
@@ -52,14 +52,23 @@ chrome.storage.local.get(['user_id', 'user_name'], result => {
 });
 
 //Create an alarm called study_time that runs every 15 minutes.
+chrome.alarms.create("testint", {periodInMinutes: 1});
 chrome.alarms.create("study_time", {periodInMinutes: 15});
 //When study_time alarm is called then check if it's the users' daily study time. 
 //If it is then open up the window
 chrome.alarms.onAlarm.addListener( alarm => {
+    if(alarm.name === "testint"){
+        console.log("testing the alarm functionality");
+    } //TODO Delete me
+
     if(alarm.name === "study_time"){
         get_todays_alarm_time().then( alarm_time => {
-            if(is_past_time(alarm_time) && !!chat_window){ //TODO also check whether there has been a study session today (and how long the sessions lasted today)
-                open_window(chat_window);
+            if(is_past_time(alarm_time) && !!chat_window){
+                user_met_goal_today().then( met_goal => {
+                    if(!met_goal){
+                        open_window(chat_window); //TODO optionally add a message for display on the window
+                    }
+                });
             }
         });
     }
