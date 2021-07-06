@@ -1,15 +1,12 @@
-/**
- * Control the popup page
- *
- * @Author Barnaby B.
- * @Since March 2019
- */
-"use strict";
-//import { media } from "./mediaLib.js";
-import { show_relevant_keywords, keyword_click, keyword_cancel_click, get_page_list_element } from "./keywords.js";
-import { escape_for_display } from "./escape_for_display.js";
-import { make_transitional } from "./transitional.js";
-import { globals } from "./globals.js";
+import {
+  show_relevant_keywords,
+  keyword_click,
+  keyword_cancel_click,
+  get_page_list_element,
+} from './keywords.js';
+import { escape_for_display } from './escape_for_display.js';
+import { make_transitional } from './transitional.js';
+import { globals } from './globals.js';
 
 // ------------------------------------------
 // Routing
@@ -26,291 +23,306 @@ let last_active_tab;
  * Route any messages relevant to the functionality of the window
  */
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    //Message from a newly loaded page
-    if(msg.type === "summary_text"){
-        summary_text(msg, sender, sendResponse);   
-    }else if(msg.type === "end_session"){
-        media.stop_recording();
-        return {"success": true}
-    }
+  //Message from a newly loaded page
+  if (msg.type === 'add-page') {
+    addPageToDOM(msg, sender, sendResponse);
+  }
 });
 
 /*
  * Set up event listeners
  */
-window.onload = function(){
-    setup_display();
+window.onload = function () {
+  setup_display();
 
-    document.addEventListener("afk_event", show_away_from_computer_overlay);
-    document.addEventListener("afk_return_verification", afk_return_verification);
+  document.addEventListener('afk_event', show_away_from_computer_overlay);
+  document.addEventListener('afk_return_verification', afk_return_verification);
 
-    document.getElementById("make_relevant_overlay_link").addEventListener("click",
-        event => hide_distracted_overlay(event));
-
-    document.getElementById("make_relevant_cancel_button").addEventListener("click",
-            event => hide_relevant_overlay(event));
-
-    document.getElementById("close_away_overlay_button").addEventListener("click",
-        event => { hide_away_overlay(event); request_return_verification()});
-
-    document.getElementById("close_distraction_overlay_button").addEventListener("click",
-        event => get_back_to_studying(event));
-
-    document.querySelector("#stop_session").addEventListener("click",
-        event =>  stop_session_click(event));
-
-    // Handle dynamically added 'make relevant' links through bubbling
-    document.querySelector("#populate_make_relevant").addEventListener("click", event => {
-        let target = event.target;
-        if(target.classList.contains("keyword_link")){
-            keyword_click(event);
-        }
+  //handle dynamically added webpage list items through bubbling
+  document
+    .querySelector('#add_pages_visited')
+    .addEventListener('click', event => {
+      let target = event.target;
+      if (target.classList.contains('make_relevant_button')) {
+        show_relevant_keywords(target);
+      } else if (
+        target.parentElement.classList.contains('make_relevant_button')
+      ) {
+        show_relevant_keywords(target.parentElement);
+      } else if (target.classList.contains('make_transitional_button')) {
+        make_transitional(event);
+      }
     });
+};
 
+function afk_return_verification() {
+  console.log('received return verification');
+  chrome.tabs.sendMessage(last_active_tab, {
+    type: 'rescan',
+  });
 
-    //handle dynamically added webpage list items through bubbling
-    document.querySelector("#add_pages_visited").addEventListener("click", event => {
-        let target = event.target;
-        if(target.classList.contains("make_relevant_button")){
-            show_relevant_keywords(target);
-        }else if(target.parentElement.classList.contains("make_relevant_button")){
-            show_relevant_keywords(target.parentElement);
-        }else if(target.classList.contains("make_transitional_button")){
-            make_transitional(event);
-        }
-    });
-}
-
-/*
- * Prevent the user from closing the window by accident 
- * if they have a session going on
- */
-window.onbeforeunload = function(){
-    return "Closing this window will end your study session";
-}
-
-function afk_return_verification(){
-    console.log("received return verification");
-    chrome.tabs.sendMessage(last_active_tab, {
-       "type": "rescan"
-   });
-}
-
-
-function show_away_from_computer_overlay(){
-    console.log("show away from computer overlay called in research.js");
-   chrome.runtime.sendMessage({
-        "type": "open_window"
-    });
-
-    document.getElementById("overlay_bg").style.display = "block";
-    document.getElementById("away_from_computer_overlay_content").style.display = "block";
-    //TODO send a message to the server after 5 seconds unless somebody clicks that they're back
-    globals.afk_counter = setTimeout(function(){
-        chrome.storage.local.get(["session_id"], results => {
-            fetch(`${globals.api_url}/pages/`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json;charset=UTF-8"},
-                body: JSON.stringify({"afk_doc": true, "session_id": results.session_id, "load_time": new Date().getTime()}),
-            }).then(()=>{
-                let add_pages_visited = document.querySelector("#add_pages_visited");
-                let page_visited_row = get_page_list_element({
-                    "is_transitional": false,
-                    "is_relevant": false,
-                    "doc_title": "Away from computer",
-                    "page_id": "",
-                    "keywords": "",
-                });
-                add_pages_visited.insertAdjacentHTML(
-                    "afterbegin", page_visited_row);
-            });
-            //TODO display an AFK segment in the URL history
+  // check of all items in storage to stop flooding the listener
+  chrome.storage.sync.get(
+    ['user_id', 'user_client_id', 'session_id', 'externalWebAppTabID'],
+    results => {
+      if (
+        results &&
+        results.session_id &&
+        results.user_client_id &&
+        results.user_id &&
+        results.externalWebAppTabID
+      ) {
+        chrome.tabs.sendMessage(results.externalWebAppTabID, {
+          type: 'not-distracted',
         });
-    });
+      }
+    }
+  );
 }
 
+function show_away_from_computer_overlay() {
+  chrome.storage.sync.get(
+    ['user_id', 'user_client_id', 'session_id', 'externalWebAppTabID'],
+    results => {
+      if (
+        results &&
+        results.session_id &&
+        results.user_client_id &&
+        results.user_id &&
+        results.externalWebAppTabID
+      ) {
+        fetch(`${globals.webapp_api_url}/send_push_notification`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            notification_message_plain: globals.notification_message_plain,
+            notification_title: globals.notification_title,
+            notification_image: globals.notification_image,
+            user_client_id: results.user_client_id,
+            notification_link: globals.notification_link,
+          }),
+        }).then(response => {
+          chrome.tabs.sendMessage(results.externalWebAppTabID, {
+            type: 'distracted',
+          });
+        });
+      }
+    }
+  );
+}
 
 /**
  * Show an overlay to tell the user that we think they're distracted.
  */
-export function show_distracted_overlay(){
-    document.getElementById("overlay_bg").style.display = "block";
-    document.getElementById("distracted_overlay_content").style.display = "block";
+export function show_distracted_overlay() {
+  document.getElementById('overlay_bg').style.display = 'block';
+  document.getElementById('distracted_overlay_content').style.display = 'block';
 }
 
 /**
  * Hide the overlay that was telling the user that we think they've stepped away from the computer.
  */
-function hide_relevant_overlay(){
-    document.getElementById("overlay_bg").style.display = "none";
-    document.getElementById("relevant_overlay_content").style.display = "none";
-    document.getElementById("populate_make_relevant").innerHTML = "";
+function hide_relevant_overlay() {
+  document.getElementById('overlay_bg').style.display = 'none';
+  document.getElementById('relevant_overlay_content').style.display = 'none';
+  document.getElementById('populate_make_relevant').innerHTML = '';
 }
 
 /**
  * Hide the overlay that was telling the user that we think they've stepped away from the computer.
  */
-function hide_away_overlay(){
-    clearTimeout(globals.afk_counter);
-    globals.afk_counter = null;
-    document.getElementById("overlay_bg").style.display = "none";
-    document.getElementById("away_from_computer_overlay_content").style.display = "none";
+function hide_away_overlay() {
+  clearTimeout(globals.afk_counter);
+  globals.afk_counter = null;
+  document.getElementById('overlay_bg').style.display = 'none';
+  document.getElementById('away_from_computer_overlay_content').style.display =
+    'none';
 }
 
-function request_return_verification(){
-    let afk_request_return_verification = new Event("afk_request_return_verification");
-    document.dispatchEvent(afk_request_return_verification);
+function request_return_verification() {
+  let afk_request_return_verification = new Event(
+    'afk_request_return_verification'
+  );
+  document.dispatchEvent(afk_request_return_verification);
 }
-
 
 /**
  * Hide the overlay that was telling the user that we think they're distracted.
  */
-function hide_distracted_overlay(){
-    document.getElementById("overlay_bg").style.display = "none";
-    document.getElementById("distracted_overlay_content").style.display = "none";
+function hide_distracted_overlay() {
+  document.getElementById('overlay_bg').style.display = 'none';
+  document.getElementById('distracted_overlay_content').style.display = 'none';
 }
 
 /**
  * Close the overlay, subtract a point from the distraction counter.
  * Open a new tab that has a search for relevant topics.
  */
-function get_back_to_studying(event){
-    console.log("closing the overlay and taking away one distraction point");
-    hide_distracted_overlay();
-    globals.distraction_counter--;
-    chrome.storage.local.get("keywords", results => {
-        let keywords_list = results.keywords.split("~").filter(el => el.length > 0);
-        let relevant_topic = keywords_list[0];
-        let win = window.open(`https://google.com/search?q=${relevant_topic}`, '_blank');
-        win.focus();
-    });
+function get_back_to_studying(event) {
+  console.log('closing the overlay and taking away one distraction point');
+  hide_distracted_overlay();
+  globals.distraction_counter--;
+  chrome.storage.sync.get('keywords', results => {
+    let keywords_list = results.keywords.split('~').filter(el => el.length > 0);
+    let relevant_topic = keywords_list[0];
+    let win = window.open(
+      `https://google.com/search?q=${relevant_topic}`,
+      '_blank'
+    );
+    win.focus();
+  });
 }
 
+function addPageToDOM(msg, sender, sendResponse) {
+  let add_pages_visited = document.querySelector('#add_pages_visited');
+  let page_visited_row = getVisitedPageContent(msg.data);
+  add_pages_visited.insertAdjacentHTML('afterbegin', page_visited_row); 
+  return true;
+}
 
-// ----------------------------------
-// message Listeners
-// -------------------------------------------------
+/* Create html content */
+const getVisitedPageContent = response => {
+  const time_loaded = new Date().getTime();
 
-/*
- * Handle a summary text  message from the content page
- */
-function summary_text(msg, sender, sendResponse){
-    last_active_tab = sender.tab.id;
-    let pkg = {
-        "doc_title": msg.doc_title,
-        "url": sender.url,
-        "content": msg.message,
-        "load_time": msg.load_time,
-        "is_relevant": true,
-        "tab_id": sender.tab.id
+  console.log(response);
+  if (!response.is_transitional) {
+    adjust_distraction_counter(response.is_relevant);
+  }
+
+  let add_pages_visited = document.querySelector('#add_pages_visited');
+  let first_child = add_pages_visited.firstElementChild;
+  if (!!first_child && first_child.classList.contains('page_list_item')) {
+    let time_div = first_child.getElementsByClassName('populate_time_spent')[0];
+    let previous_time = time_div.getAttribute('time_loaded');
+    let time_delta = (time_loaded - Number(previous_time)) / 1000;
+    let time_delta_mins = Math.floor(time_delta / 60);
+    let time_delta_secs = Math.floor(time_delta % 60);
+    if (time_delta_secs < 10) {
+      time_delta_secs = '0' + time_delta_secs;
     }
+    let display_time = `${time_delta_mins}:${time_delta_secs}`;
+    time_div.innerText = display_time;
+  }
 
-    chrome.storage.local.get(["session_id", "start_time", "user_id"], results => {
-        if(!results || !results.session_id){
-            throw new Exception("There is no session ID but we called STOP on it");
-        }
-        pkg["session_id"] = results.session_id;
-        fetch(`${globals.api_url}/pages/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json;charset=UTF-8"},
-            body: JSON.stringify(pkg),
-        }).then(response => {
-            if(response.ok){
-                return response.json();
-            }else{
-                throw new Error("Network response was not OK");
-            }
-        }).then( response => {
-            let add_pages_visited = document.querySelector("#add_pages_visited");
-            //TODO add the doc title into the returned fields in the server
-            response.doc_title = msg.doc_title;
-            let page_visited_row = get_page_list_element(response);
-            add_pages_visited.insertAdjacentHTML(
-                "afterbegin", page_visited_row); //afterbegin prepends it, beforeend appends
+  const page_id = escape_for_display(response.page_id);
+  const keywords = escape_for_display(response.keywords);
+  const doc_title = escape_for_display(response.doc_title);
 
-        }).catch( error => {
-            //TODO put something on the page that says a page result failed to register
-            console.log("THERE WAS AN ERROR SHOWING A PAGE!!!");
-        });
-    });
-    hide_away_overlay();
-    return true;
-}
+  let yes_class =
+    !response.is_transitional & response.is_relevant
+      ? 'btn-success'
+      : 'btn-light';
+  let mr_class =
+    !response.is_transitional & !response.is_relevant
+      ? 'make_relevant_button'
+      : '';
+  let mt_class =
+    !response.is_transitional & !response.is_relevant
+      ? 'make_relevant_button'
+      : ''; //TODO add this to the transitional button bellow
+  let no_class =
+    !response.is_transitional & !response.is_relevant
+      ? 'btn-danger'
+      : 'btn-light';
+  let transit_class = response.is_transitional ? 'btn-secondary' : 'btn-light';
+  try {
+    return `
+          <div class="row page_list_item" page_id="${page_id}">
+              <div class="col-2 populate_time_spent" time_loaded="${time_loaded}">
+              . . .
+              </div>
+              <div class="col-7 row page_list_title" style="overflow: hidden; white-space: nowrap;">
+                  ${doc_title}
+              </div>
+              <button class="col-1 btn ${yes_class} ${mr_class}"
+                  page_id="${page_id}"
+                  noun_keywords="${keywords}">
+                      ${response.is_relevant ? '' : '<span class="mytooltip">'}
+                      Yes
+                      ${
+                        response.is_relevant
+                          ? ''
+                          : '<span class="mytooltiptext">Change this page to relevant.</span> </span>'
+                      }
+              </button>
+              <button class="col-1 btn ${no_class}" disabled>
+                  No
+              </button>
+              <button class="col-1 btn ${transit_class}" disabled>
+                  Transit
+              </button>
+          </div>
+          `;
+  } catch (e) {
+    console.log('unable to render');
+    return '<div class="row">Unable to render this page</div>';
+  }
+};
 
-// ---------------------------------------------------
-// Event Listeners
-// ------------------------------------------------
+function setup_display() {
+  chrome.storage.sync.get(
+    [
+      'session_id',
+      'start_time',
+      'user_name',
+      'user_id',
+      'description',
+      'keywords',
+    ],
+    result => {
+      //Check that everything is OK
+      if (!result || !result.session_id || !result.user_name) {
+        console.error('THERE WAS SOMETHING WRONG WITH SAVING THE SESSION');
+      }
 
-/*
- * Clicking stop_session button ends the session
- *
- * Here the background manages the state in case the 
- * user tries to close the window right away
- */
-function stop_session_click(){
-    let stop_time = new Date();
-    chrome.storage.local.get(["session_id"], result => {
-        chrome.runtime.sendMessage({
-            "type": "stop_session",
-            "stop_time": stop_time.getTime(),
-        }, response => {
-            window.onbeforeunload = null;
-            //media.stop_recording();
-            window.location = `/html/basic_session_report.html#${result.session_id}`;
-            return true;
-        });
-    });
-}
-
-/*
- * When the page loads first check whether there's an ongoing session (unlikely)
- * and whether the user has already logged in before and provided a name. If they
- * haven't then ask them for their name.
- *
- */
-function setup_display(){
-    chrome.storage.local.get(["session_id", "start_time", "user_name", "user_id", "description", "keywords"], result => {
-        //Check that everything is OK
-        if(!result || !result.session_id || !result.user_name){
-           console.error("THERE WAS SOMETHING WRONG WITH SAVING THE SESSION"); 
-        }
-        
-        let keywords_list = result.keywords.split("~")
-            .filter(el => el.length > 0)
-            .map(el => escape_for_display(el));
-        let keywords_tags = `
-                ${keywords_list.map( keyword => ` 
+      let keywords_list = result.keywords
+        .split('~')
+        .filter(el => el.length > 0)
+        .map(el => escape_for_display(el));
+      let keywords_tags = `
+                ${keywords_list
+                  .map(
+                    keyword => ` 
                     <div class="col-4 keyword_list_item">
                         ${keyword}
                     </div>
-                `).join('')}
-        `
+                `
+                  )
+                  .join('')}
+        `;
 
-        document.getElementById("populate_keywords").innerHTML = keywords_tags;
-        document.getElementById("populate_description").innerText = result.description;
+      document.getElementById('populate_keywords').innerHTML = keywords_tags;
+      document.getElementById('populate_description').innerText =
+        result.description;
 
-        let relevant_topic = keywords_list[0];
-        let win = window.open(`https://google.com/search?q=${relevant_topic}`, '_blank');
-        win.focus();
+      let relevant_topic = keywords_list[0];
+      // let win = window.open(`https://google.com/search?q=${relevant_topic}`, '_blank');
+      // win.focus();
 
-        
-        // calculate how much time is left in the session
-        let start_time = new Date(result.start_time)
-        function get_timer(){
-            let diff = new Date() - start_time; 
-            let mins = Math.floor((diff/1000) / 60); 
-            let hours = Math.floor(mins / 60); 
-            let secs = Math.floor((diff/1000) % 60); 
-            if(secs < 10){secs = "0" + secs;}
-            if(mins < 10){mins = "0" + mins;}
-            if(hours < 10){hours = "0" + hours;}
-            return `${hours}:${mins}:${secs}`;
+      // calculate how much time is left in the session
+      let start_time = new Date(result.start_time);
+      function get_timer() {
+        let diff = new Date() - start_time;
+        let mins = Math.floor(diff / 1000 / 60);
+        let hours = Math.floor(mins / 60);
+        let secs = Math.floor((diff / 1000) % 60);
+        if (secs < 10) {
+          secs = '0' + secs;
         }
-        
-        //Update the clock every second using the above calculations
-        setInterval(function(){
-            document.getElementById("populate_countdown_clock").innerText = get_timer();
-        }, 1000)
-    });
+        if (mins < 10) {
+          mins = '0' + mins;
+        }
+        if (hours < 10) {
+          hours = '0' + hours;
+        }
+        return `${hours}:${mins}:${secs}`;
+      }
+
+      //Update the clock every second using the above calculations
+      setInterval(function () {
+        document.getElementById('populate_countdown_clock').innerText =
+          get_timer();
+      }, 1000);
+    }
+  );
 }

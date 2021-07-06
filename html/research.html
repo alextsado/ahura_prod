@@ -1,24 +1,14 @@
-<!-- First PopUp page, for now just a form that collects the users' 
-    description and some additional keywords
-
-    @Author Barnaby B
-    @Since March 2018
--->
 <html>
     <head>
         <link rel="stylesheet" href="/css/bootstrap.css">
         <link rel="stylesheet" href="/css/ahura.css">
-        <!-- TODO download these locally instead of an external link -->
-        <!-- link href="https://fonts.googleapis.com/css?family=Bree+Serif" rel="stylesheet" -->
-        <!-- link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" -->
-        <script src="/tf/face-api.js"></script>
-        <script src="/tf/drawing.js"></script>
-        <script src="/tf/faceDetectionControls.js"></script>
-        <script src="/tf/inlineScript.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
+        <script src="../src/tf/sketch.js"></script>
         <script type="module" src="/src/research.js"></script>
         <meta charset="UTF-8"> 
     </head>
-    <body> 
+    <body style="overflow: hidden;"> 
 
         <!-- overlays -->
         <div id="overlay_bg"> 
@@ -120,9 +110,9 @@
                         &nbsp;
                     </div>
                     <div class="col-2">
-                        <button class="btn btn-primary" id="stop_session" style="margin-top: 10px;">
+                        <!-- <button class="btn btn-primary" id="stop_session" style="margin-top: 10px;">
                             Finish
-                        </button>
+                        </button> -->
                     </div>
                 </div>
             </div>
@@ -195,22 +185,12 @@
 
 
                     <!-- Video of the user (for the demo) -->
-
-                    <div class="col-4" style="background: url('/images/chrome_camera_permissions.jpg'); background-repeat: no-repeat; background-size: 300px 250px;">
-                        <div id="tf_canvas" class="row">
-                            <video id="inputVideo" autoplay muted></video>
-                            <canvas id="overlay" />
+                    <!-- <div class="col-4" style="background: url('/images/chrome_camera_permissions.jpg'); background-repeat: no-repeat; background-size: 300px 250px;">
+                        <div id="face_canvas" class="row">
                         </div>
-                        <div id="tf_emotion" class="row">
-                            <div class="col" id="emotion_display" style="text-align: center">
-                                &nbsp;
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div id="enter_image_content" class="col-3">
-                                <img src="/images/login_asset.png" id="session_asset">
-                            </div>
-                        </div>
+                    </div> -->
+                        
+                    <div id="face_canvas" class="row">
                     </div>
                 </div>
             </div>

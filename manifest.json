@@ -1,29 +1,32 @@
- {
-    "name": "Ahura AI Study Sessions",
-    "short_name": "Study Sessions",
-    "version": "0.2.01",
-    "author": "Ahura AI",
-    "homepage_url": "https://www.ahuraai.com",
-    "description": "Focus and measure your study sessions.",
-    "manifest_version": 2,
-    "browser_action": { 
-        "default_title": "Ahura AI Demo.", 
-        "default_icon":  "/images/favicon.png"
-     },
-    "permissions": [
-            "storage",
-            "alarms",
-            "https://devapi.spentaai.com/*/*"
-    ],
-    "background": {
-        "page": "html/background.html"
-    },
-    "content_scripts": [{
-        "matches": ["http://*/*", "https://*/*"], 
-        "run_at": "document_idle",
-        "js": ["src/content.js"]
-    }],
-    "icons":{
-        "128":"images/favicon.png"
+{
+  "name": "Ahura AI Study Sessions",
+  "short_name": "Study Sessions",
+  "version": "1.0.0",
+  "author": "Ahura AI",
+  "homepage_url": "https://www.ahura.ai/",
+  "description": "Focus and measure your study sessions.",
+  "manifest_version": 2,
+  "browser_action": {
+    "default_title": "Ahura AI",
+    "default_icon": "/images/favicon.png"
+  },
+  "permissions": ["tabs", "storage", "http://3.132.191.11/*", "https://www.ahura.ai/*"],
+  "background": {
+    "page": "html/background.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "run_at": "document_idle",
+      "js": ["src/ext/content.js"]
     }
-  }
+  ],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2zQrjUtGM8DqwnE7+FYoaGaMZLkG0wR/QEip4w+7MZw8I9W+7P2HvaDOvkvHWG0V9haStN6pRmkqnaq2oKqhEWiXpzrokqi4hiLiOpZnciTr3tZoOroU9a0rbL/c5TKgrOx8vXTXHm6+XEcIKXEQOY0S1/ElkUfq+Rp47ORnCb3lrfUVMtgNJGSsh1cVfsyf/YC1FWYI6U2k4qTNX5UqmXa2bIZts9OWxc6D+OauFkTbGxqusPATFRPzYE+bt2XYaHK0tcpTebvihvT5iMNrxGdQf7amiaBpjQLR27/odAD+VITwflRollqHtzxJVGNs0mbOhV4iW/dM3I/+Zy75+QIDAQAB",
+  "icons": {
+    "128": "images/favicon.png"
+  },
+  "externally_connectable": {
+    "matches": ["https://www.ahura.ai/*"]
+  },
+  "content_security_policy": "script-src 'self' https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js https://unpkg.com/@tensorflow-models/face-landmarks-detection@0.0.1/dist/face-landmarks-detection.js https://unpkg.com/@tensorflow/tfjs-backend-webgl@2.4.0/dist/tf-backend-webgl.js https://unpkg.com/@tensorflow/tfjs-backend-cpu@2.4.0/dist/tf-backend-cpu.js https://unpkg.com/@tensorflow/tfjs-core@2.4.0/dist/tf-core.js https://unpkg.com/@tensorflow/tfjs-converter@2.4.0/dist/tf-converter.js https://unpkg.com/@tensorflow/tfjs-core@1.7.0/dist/tf-core.js 'unsafe-eval'; object-src 'self'"
+}
